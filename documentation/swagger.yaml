@@ -54,14 +54,32 @@ paths:
       tags:
       - "users"
       summary: "Get a user"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username of the user to get"
+        required: true
+        type: "string"
     put:
       tags:
       - "users"
       summary: "Edits a user"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username of the user to edit"
+        required: true
+        type: "string"
     delete:
       tags:
       - "users"
       summary: "Removes a user"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username of the user to delete"
+        required: true
+        type: "string"
   
   # ============== MEMES ==============
   /memes:
@@ -78,10 +96,78 @@ paths:
       tags:
       - "memes"
       summary: "Get a meme"
+      parameters:
+      - name: "memeId"
+        in: "path"
+        description: "id of the meme to get"
+        required: true
+        type: "integer"
     delete:
       tags:
       - "memes"
       summary: "Delete a meme"
+      parameters:
+      - name: "memeId"
+        in: "path"
+        description: "id of the meme to delete"
+        required: true
+        type: "integer"
+      
+  # ============== TEMPLATES ==============
+  /templates:
+    post:
+      tags:
+      - "templates"
+      summary: "Create a new meme template"
+    get:
+      tags:
+      - "templates"
+      summary: "Get a list of memes"
+  /templates/{templateId}:
+    get:
+      tags:
+      - "templates"
+      summary: "Get a template"
+      parameters:
+      - name: "templateId"
+        in: "path"
+        description: "id of the template to get"
+        required: true
+        type: "integer"
+    delete:
+      tags:
+      - "templates"
+      summary: "Delete a template"
+      parameters:
+      - name: "templateId"
+        in: "path"
+        description: "id of the template to delete"
+        required: true
+        type: "integer"
+        
+  # ============== COMMENTS ==============
+  /comments/{parentCommentId}:
+    post:
+      tags:
+      - "comments"
+      summary: "Reply to a comment"
+      - name: "parentCommentId"
+        in: "path"
+        description: "id of the comment to respond to"
+        required: true
+        type: "integer"
+  /comments/{memeId}:
+    post:
+      tags:
+      - "comments"
+      summary: "Post a comment on a meme"
+      - name: "memeId"
+        in: "path"
+        description: "id of the meme to comment on"
+        required: true
+        type: "integer"
+
+      
 definitions:
   User:
     type: "object"
