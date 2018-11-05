@@ -37,7 +37,10 @@ paths:
       - "application/json"
       parameters:
       - name: "namequery"
-      - name: "limit"
+        in: "query"
+        description: "search query for usernames"
+        required: true
+        type: "string"
       responses:
         200:
           description: "successful operation"
@@ -60,6 +63,9 @@ paths:
         description: "username of the user to get"
         required: true
         type: "string"
+      responses:
+        200:
+          description: "successful operation"
     put:
       tags:
       - "users"
@@ -146,26 +152,23 @@ paths:
         type: "integer"
         
   # ============== COMMENTS ==============
-  /comments/{parentCommentId}:
-    post:
-      tags:
-      - "comments"
-      summary: "Reply to a comment"
-      - name: "parentCommentId"
-        in: "path"
-        description: "id of the comment to respond to"
-        required: true
-        type: "integer"
   /comments/{memeId}:
+    get:
+      tags:
+      - "comments"
+      summary: "Get all comments on a meme"
+  /comments:
     post:
       tags:
       - "comments"
-      summary: "Post a comment on a meme"
-      - name: "memeId"
-        in: "path"
-        description: "id of the meme to comment on"
+      summary: "Comment on a meme"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Comment to be added"
         required: true
-        type: "integer"
+        schema:
+          $ref: "#/definitions/Comment"
 
       
 definitions:
