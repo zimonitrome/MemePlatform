@@ -182,7 +182,8 @@ paths:
           description: "successful operation"
         
   # ============== COMMENTS ==============
-  /comments/{memeId}:
+  /memes/{memeId}/comments:
+    # TODO: Eeeeh maybe not the best thingy
     get:
       tags:
       - "comments"
@@ -208,6 +209,44 @@ paths:
         required: true
         schema:
           $ref: "#/definitions/Comment"
+      responses:
+        200:
+          description: "successful operation"
+  /comments/{commentId}:
+    delete:
+      tags:
+      - "comments"
+      parameters:
+      - name: "commentId"
+        in: "path"
+        description: "Comment to be deleted"
+        required: true
+        type: "integer"
+      summary: "Delete a comment"
+      responses:
+        200:
+          description: "successful operation"
+      
+  # ============== CATEGORIES ==============
+  /categories:
+    get:
+      tags:
+      - "categories"
+      summary: "Get a list of categories"
+      responses:
+        200:
+          description: "successful operation"
+    post:
+      tags:
+      - "categories"
+      summary: "Comment on a meme"
+      parameters:
+      - in: "body"
+        name: "Category"
+        description: "Category to be added"
+        required: true
+        schema:
+          type: "string"
       responses:
         200:
           description: "successful operation"
@@ -250,6 +289,8 @@ definitions:
         type: "string"
       votes:
         type: "integer"
+      postDate:
+        type: "integer"
   MemeTemplate:
     type: "object"
     required:
@@ -286,6 +327,10 @@ definitions:
       text:
         type: "string"
       votes:
+        type: "integer"
+      postDate:
+        type: "integer"
+      lastEdited:
         type: "integer"
   Category:
     type: "object"
