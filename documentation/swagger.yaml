@@ -76,6 +76,9 @@ paths:
         description: "username of the user to edit"
         required: true
         type: "string"
+      responses:
+        200:
+          description: "successful operation"
     delete:
       tags:
       - "users"
@@ -86,6 +89,9 @@ paths:
         description: "username of the user to delete"
         required: true
         type: "string"
+      responses:
+        200:
+          description: "successful operation"
   
   # ============== MEMES ==============
   /memes:
@@ -93,10 +99,16 @@ paths:
       tags:
       - "memes"
       summary: "Post a new meme"
+      responses:
+        200:
+          description: "successful operation"
     get:
       tags:
       - "memes"
       summary: "Get a list of memes"
+      responses:
+        200:
+          description: "successful operation"
   /memes/{memeId}:
     get:
       tags:
@@ -108,6 +120,9 @@ paths:
         description: "id of the meme to get"
         required: true
         type: "integer"
+      responses:
+        200:
+          description: "successful operation"
     delete:
       tags:
       - "memes"
@@ -118,6 +133,9 @@ paths:
         description: "id of the meme to delete"
         required: true
         type: "integer"
+      responses:
+        200:
+          description: "successful operation"
       
   # ============== TEMPLATES ==============
   /templates:
@@ -125,10 +143,16 @@ paths:
       tags:
       - "templates"
       summary: "Create a new meme template"
+      responses:
+        200:
+          description: "successful operation"
     get:
       tags:
       - "templates"
       summary: "Get a list of memes"
+      responses:
+        200:
+          description: "successful operation"
   /templates/{templateId}:
     get:
       tags:
@@ -140,6 +164,9 @@ paths:
         description: "id of the template to get"
         required: true
         type: "integer"
+      responses:
+        200:
+          description: "successful operation"
     delete:
       tags:
       - "templates"
@@ -150,6 +177,9 @@ paths:
         description: "id of the template to delete"
         required: true
         type: "integer"
+      responses:
+        200:
+          description: "successful operation"
         
   # ============== COMMENTS ==============
   /comments/{memeId}:
@@ -157,6 +187,15 @@ paths:
       tags:
       - "comments"
       summary: "Get all comments on a meme"
+      parameters:
+      - name: "memeId"
+        in: "path"
+        description: "Id of meme to get comments of"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
   /comments:
     post:
       tags:
@@ -169,6 +208,9 @@ paths:
         required: true
         schema:
           $ref: "#/definitions/Comment"
+      responses:
+        200:
+          description: "successful operation"
 
       
 definitions:
