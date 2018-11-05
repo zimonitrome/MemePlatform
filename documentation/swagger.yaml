@@ -1,0 +1,113 @@
+swagger: "2.0"
+info:
+  title: "Meme Platform"
+  description: "Platform for memes."
+  version: "1.0.0"
+host: "TBA"
+
+tags:
+- name: "users"
+  description: "Registered users"
+- name: "memes"
+  description: "Created meme posts"
+- name: "templates"
+  description: "Template images"
+- name: "comments"
+  description: "Comments on meme posts"
+- name: "categories"
+  description: "Categories of memes"
+  
+paths:
+  /users:
+    post:
+      tags:
+      - "users"
+      summary: "Register a new user"
+      consumes:
+      - "application/json"
+      responses:
+        405:
+          description: "Invalid input"
+          
+definitions:
+  User:
+    type: "object"
+    required:
+    - "username"
+    - "passwordHash"
+    - "salt"
+    properties:
+      username:
+        type: "string"
+      passwordHash:
+        type: "string"
+      salt:
+        type: "string"
+    xml:
+      name: "User"
+  Meme:
+    type: "object"
+    required:
+    - "id"
+    - "templateId"
+    - "username"
+    - "image"
+    - "votes"
+    properties:
+      id:
+        type: "integer"
+      templateId:
+        type: "integer"
+      username:
+        type: "string"
+      categoryId:
+        type: "integer"
+      name:
+        type: "string"
+      image:
+        type: "blob"
+      votes:
+        type: "integer"
+    xml:
+      name: "User"
+  MemeTemplate:
+    type: "object"
+    required:
+    - "id"
+    - "username"
+    - "name"
+    - "image"
+    properties:
+      id:
+        type: "integer"
+      username:
+        type: "string"
+      name:
+        type: "string"
+      image:
+        type: "blob"
+    xml:
+      name: "User"
+  Comment:
+    type: "object"
+    required:
+    - "id"
+    - "memeId"
+    - "username"
+    - "text"
+    - "votes"
+    properties:
+      id:
+        type: "integer"
+      memeId:
+        type: "integer"
+      username:
+        type: "string"
+      parentCommentId:
+        type: "string"
+      text:
+        type: "string"
+      votes:
+        type: "integer"
+    xml:
+      name: "User"
