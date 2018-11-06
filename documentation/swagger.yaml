@@ -51,17 +51,16 @@ paths:
         500:
           description: "Internal Server Error"
     get:
-    # TODO: Maybe only get usernames or remove
       tags:
       - "users"
-      summary: "Get a list of users"
+      summary: "Get a list of usernames"
       produces:
       - "application/json"
       parameters:
       - name: "namequery"
         in: "query"
         description: "search query for usernames"
-        required: true
+        required: false
         type: "string"
       responses:
         200:
@@ -69,7 +68,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/User"
+              type: "string"
         400:
           description: "Bad Request"
         404:
@@ -77,28 +76,6 @@ paths:
         500:
           description: "Internal Server Error"
   /users/{username}:
-    get:
-    # TODO: Maybe remove
-      tags:
-      - "users"
-      summary: "Get a user"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "username of the user to get"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "Successful Operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Bad Request"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
     put:
       tags:
       - "users"
@@ -113,7 +90,8 @@ paths:
         name: "password"
         description: "new password to update"
         required: true
-        type: "string"
+        schema:
+          type: "string"
       responses:
         200:
           description: "Successful Operation"
@@ -324,8 +302,7 @@ paths:
           description: "Internal Server Error"
         
   # ============== COMMENTS ==============
-  /memes/{memeId}/comments:
-    # TODO: Eeeeh maybe not the best thingy
+  /comments/{memeId}:
     get:
       tags:
       - "comments"
@@ -402,18 +379,27 @@ paths:
       
   # ============== CATEGORIES ==============
   /categories:
-    # TODO: Fortsätt här
     get:
       tags:
       - "categories"
       summary: "Get a list of categories"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful Operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Category"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
     post:
       tags:
       - "categories"
-      summary: "Comment on a meme"
+      summary: "Post a new category"
       parameters:
       - in: "body"
         name: "Category"
@@ -423,7 +409,11 @@ paths:
           type: "string"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful Operation"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
 
       
 definitions:
