@@ -160,6 +160,27 @@ paths:
       tags:
       - "memes"
       summary: "Get a list of memes"
+      parameters:
+      - name: "namequery"
+        in: "query"
+        description: "search query for names"
+        required: false
+        type: "string"
+      - name: "templateId"
+        in: "query"
+        description: "ID of template to get memes by"
+        required: false
+        type: "string"
+      - name: "username"
+        in: "query"
+        description: "name of user to get memes by"
+        required: false
+        type: "string"
+      - name: "categoryId"
+        in: "query"
+        description: "ID of category to get memes by"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Successful Operation"
@@ -248,6 +269,17 @@ paths:
       tags:
       - "templates"
       summary: "Get a list of memes"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "name of user to get templates by"
+        required: false
+        type: "string"
+      - name: "namequery"
+        in: "query"
+        description: "search query for names"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Successful Operation"
@@ -315,7 +347,17 @@ paths:
         type: "string"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful Operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Comment"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
   /comments:
     post:
       tags:
@@ -383,6 +425,12 @@ paths:
       tags:
       - "categories"
       summary: "Get a list of categories"
+      parameters:
+      - name: "namequery"
+        in: "query"
+        description: "search query for name"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Successful Operation"
