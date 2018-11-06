@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  title: "Meme Platform"
+  title: "Schpoop"
   description: "Platform for memes."
   version: "1.0.0"
 host: "TBA"
@@ -138,6 +138,8 @@ paths:
           - "templateId"
           - "username"
           - "imageSource"
+          - "isTwitterFormat"
+          - "isDeepFried"
           properties:
             templateId:
               type: "integer"
@@ -148,6 +150,14 @@ paths:
             name:
               type: "string"
             imageSource:
+              type: "string"
+            isTwitterFormat:
+              type: "boolean"
+            isDeepFried:
+              type: "boolean"
+            topText:
+              type: "string"
+            bottomText:
               type: "string"
       responses:
         200:
