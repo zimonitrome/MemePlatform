@@ -120,6 +120,35 @@ paths:
           description: "Not Found"
         500:
           description: "Internal Server Error"
+  /users/login-sessions:
+    post:
+      tags:
+      - "users"
+      summary: "Creates a new login session"
+      consumes:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User to be logged in"
+        required: true
+        schema:
+          type: "object"
+          required:
+          - "username"
+          - "password"
+          properties:
+            username:
+              type: "string"
+            password:
+              type: "string"
+      responses:
+        200:
+          description: "Successful Operation"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
   
   # ============== MEMES ==============
   /memes:
@@ -472,7 +501,76 @@ paths:
           description: "Bad Request"
         500:
           description: "Internal Server Error"
-
+          
+  # ============== VOTES ==============
+  /votes:
+    get:
+      tags:
+      - "votes"
+      summary: "Get a user's vote on a meme"
+      parameters:
+      - name: "memeId"
+        in: "query"
+        description: "ID of the meme"
+        required: true
+        type: "integer"
+      - name: "username"
+        in: "query"
+        description: "name of the user"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful Operation"
+          schema:
+            type: "integer"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Not Found"
+        500:
+          description: "Internal Server Error"
+  /votes/{memeId}:
+    post:
+      tags:
+      - "votes"
+      summary: "Vote on a meme"
+      parameters:
+      - name: "memeId"
+        in: "path"
+        description: "ID of the meme"
+        required: true
+        type: "integer"      
+      - in: "body"
+        name: "vote"
+        description: "Whether the vote is up or down. (1 for up, -1 for down)"
+        required: true
+        schema:
+          type: "integer"
+      responses:
+        200:
+          description: "Successful Operation"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
+    delete:
+      tags: 
+      - "votes"
+      summary: "Undo a vote on a meme"
+      parameters:
+      - name: "memeId"
+        in: "path"
+        description: "ID of the meme"
+        required: true
+        type: "integer" 
+      responses:
+        200:
+          description: "Successful Operation"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
       
 definitions:
   User:
@@ -536,7 +634,6 @@ definitions:
     - "memeId"
     - "username"
     - "text"
-    - "votes"
     properties:
       id:
         type: "integer"
@@ -548,8 +645,6 @@ definitions:
         type: "string"
       text:
         type: "string"
-      votes:
-        type: "integer"
       postDate:
         type: "integer"
       lastEdited:
@@ -564,3 +659,15 @@ definitions:
         type: "integer"
       name:
         type: "string"
+  Vote:
+    type: "object"
+    required:
+    - "memeId"
+    - "username"
+    properties:
+      memeId:
+        type: "integer"
+      username:
+        type: "string"
+      vote:
+        type: "integer"
