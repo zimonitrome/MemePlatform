@@ -569,23 +569,12 @@ paths:
           description: "Successful Operation"
         400:
           description: "Bad Request"
+        404:
+          description: "Not Found"
         500:
           description: "Internal Server Error"
       
 definitions:
-  User:
-    type: "object"
-    required:
-    - "username"
-    - "passwordHash"
-    - "salt"
-    properties:
-      username:
-        type: "string"
-      passwordHash:
-        type: "string"
-      salt:
-        type: "string"
   Meme:
     type: "object"
     required:
@@ -659,15 +648,3 @@ definitions:
         type: "integer"
       name:
         type: "string"
-  Vote:
-    type: "object"
-    required:
-    - "memeId"
-    - "username"
-    properties:
-      memeId:
-        type: "integer"
-      username:
-        type: "string"
-      vote:
-        type: "integer"
