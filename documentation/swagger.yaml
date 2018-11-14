@@ -34,10 +34,12 @@ paths:
         schema:
           $ref: "#/definitions/User"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "User was registered correctly"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         409:
           description: "User already exists"
         500:
@@ -49,20 +51,22 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "namequery"
+      - name: "name"
         in: "query"
         description: "search query for usernames"
         required: false
         type: "string"
       responses:
         200:
-          description: "Successful Operation"
+          description: "Successfully returned users"
           schema:
             type: "array"
             items:
               type: "string"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -85,10 +89,12 @@ paths:
         schema:
           type: "string"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Successfully changed password"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -104,10 +110,12 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "User was deleted"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -127,10 +135,12 @@ paths:
         schema:
           $ref: "#/definitions/User"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Logged user in"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
   
@@ -148,10 +158,12 @@ paths:
         schema:
           $ref: "#/definitions/NewMeme"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Meme was posted"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
     get:
@@ -159,7 +171,7 @@ paths:
       - "memes"
       summary: "Get a list of memes"
       parameters:
-      - name: "namequery"
+      - name: "name"
         in: "query"
         description: "search query for names"
         required: false
@@ -181,13 +193,15 @@ paths:
         type: "string"
       responses:
         200:
-          description: "Successful Operation"
+          description: "Successfully returned memes"
           schema:
             type: "array"
             items:
               $ref: "#/definitions/Meme"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -205,11 +219,13 @@ paths:
         type: "integer"
       responses:
         200:
-          description: "Successful Operation"
+          description: "Successfully fetched a single meme"
           schema:
             $ref: "#/definitions/Meme"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -225,10 +241,12 @@ paths:
         required: true
         type: "integer"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Meme was deleted"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
       
@@ -246,10 +264,12 @@ paths:
         schema:
           $ref: "#/definitions/NewMemeTemplate"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Template was created"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
     get:
@@ -262,20 +282,22 @@ paths:
         description: "name of user to get templates by"
         required: false
         type: "string"
-      - name: "namequery"
+      - name: "name"
         in: "query"
         description: "search query for names"
         required: false
         type: "string"
       responses:
         200:
-          description: "Successful Operation"
+          description: "Successfully fetched memes"
           schema:
             type: "array"
             items:
               $ref: "#/definitions/MemeTemplate"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -293,11 +315,13 @@ paths:
         type: "integer"
       responses:
         200:
-          description: "successful operation"
+          description: "Successfully fetched template"
           schema:
             $ref: "#/definitions/MemeTemplate"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -313,10 +337,12 @@ paths:
         required: true
         type: "integer"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Successfully removed template"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
         
@@ -334,13 +360,15 @@ paths:
         type: "string"
       responses:
         200:
-          description: "Successful Operation"
+          description: "Successfully fetched comment"
           schema:
             type: "array"
             items:
               $ref: "#/definitions/Comment"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -358,10 +386,12 @@ paths:
         schema:
           $ref: "#/definitions/NewComment"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Successfully posted comment"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
   /comments/{commentId}:
@@ -382,10 +412,12 @@ paths:
         schema:
           type: "string"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Successfully edited comment"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
     delete:
@@ -399,10 +431,12 @@ paths:
         type: "integer"
       summary: "Delete a comment"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Successfully removed comment"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
       
@@ -413,20 +447,22 @@ paths:
       - "categories"
       summary: "Get a list of categories"
       parameters:
-      - name: "namequery"
+      - name: "name"
         in: "query"
         description: "search query for name"
         required: false
         type: "string"
       responses:
         200:
-          description: "Successful Operation"
+          description: "Successfully fetched categories"
           schema:
             type: "array"
             items:
               $ref: "#/definitions/Category"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -443,10 +479,12 @@ paths:
         schema:
           type: "string"
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Successfully posted category"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
           
@@ -469,11 +507,13 @@ paths:
         type: "string"
       responses:
         200:
-          description: "Successful Operation"
+          description: "Successfully fetched votes"
           schema:
             type: "integer"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
@@ -497,9 +537,11 @@ paths:
           type: "integer"
       responses:
         200:
-          description: "Successful Operation"
+          description: "Vote successfully posted"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         500:
           description: "Internal Server Error"
     delete:
@@ -513,10 +555,12 @@ paths:
         required: true
         type: "integer" 
       responses:
-        200:
-          description: "Successful Operation"
+        204:
+          description: "Vote successfully removed"
         400:
-          description: "Bad Request"
+          description: "Bad Request, see error message"
+          schema:
+            type: "string"
         404:
           description: "Not Found"
         500:
