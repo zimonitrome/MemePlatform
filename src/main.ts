@@ -1,9 +1,7 @@
 import * as express from "express";
-
+import memesRouter from "./routes/memes";
 const app = express();
 
-app.get("/memes", (request, response) => {
-	response.status(200).json({ namn: "Flyckt", Age: 12 });
-});
+app.use("/memes", memesRouter);
 
 app.listen(80);
