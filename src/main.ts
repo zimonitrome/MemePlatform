@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 import memesRouter from "./routes/memes";
 const app = express();
 
