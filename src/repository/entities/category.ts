@@ -1,8 +1,8 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class Vote {
-	@PrimaryColumn()
+export class Category {
+	@PrimaryGeneratedColumn()
 	id!: number;
 
 	@Column()

@@ -1,8 +1,13 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
+import {
+	Entity,
+	Column,
+	PrimaryGeneratedColumn,
+	CreateDateColumn
+} from "typeorm";
 
 @Entity()
 export class Meme {
-	@PrimaryColumn()
+	@PrimaryGeneratedColumn()
 	id!: number;
 
 	@Column()

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryColumn } from "typeorm";
 
 @Entity()
-export class Vote {
+export class User {
 	@PrimaryColumn()
 	username!: string;
 
