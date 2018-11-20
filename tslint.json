@@ -21,7 +21,7 @@
 		"prefer-object-spread": true,
 		"radix": true,
 		"no-switch-case-fall-through": true,
-		"member-access": true,
+		"member-access": false,
 		"no-console": false,
 		"no-var-requires": true,
 		"no-shadowed-variable": true,
