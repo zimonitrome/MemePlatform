@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
-import { userInfo } from "os";
 
 @Entity()
 export class Meme {

@@ -1,28 +1,16 @@
 import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
 
 @Entity()
-export class Comment {
+export class MemeTemplate {
 	@PrimaryColumn()
 	id!: number;
-
-	@Column()
-	memeId!: number;
 
 	@Column()
 	username!: string;
 
 	@Column()
-	categoryId!: number;
+	imageSource!: string;
 
 	@Column({ nullable: true })
 	name?: string;
-
-	@Column()
-	imageSource!: string;
-
-	@Column()
-	votes!: number;
-
-	@CreateDateColumn()
-	postDate!: Date;
 }
