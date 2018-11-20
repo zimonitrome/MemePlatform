@@ -1,8 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
+import { userInfo } from "os";
 
 @Entity()
 export class Meme {
-	@PrimaryGeneratedColumn()
+	@PrimaryColumn()
 	id!: number;
 
 	@Column()
@@ -11,10 +12,10 @@ export class Meme {
 	@Column()
 	username!: string;
 
-	@Column()
+	@Column({ nullable: true })
 	categoryId?: number;
 
-	@Column()
+	@Column({ nullable: true })
 	name?: string;
 
 	@Column()
@@ -23,6 +24,6 @@ export class Meme {
 	@Column()
 	votes!: number;
 
-	@Column()
-	postDate!: number;
+	@CreateDateColumn()
+	postDate!: Date;
 }
