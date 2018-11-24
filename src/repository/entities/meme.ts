@@ -7,11 +7,26 @@ import {
 
 @Entity()
 export class Meme {
+	constructor(
+		templateId: number,
+		username: string,
+		imageSource: string,
+		categoryId?: number,
+		name?: string
+	) {
+		this.templateId = templateId;
+		this.username = username;
+		this.imageSource = imageSource;
+		this.categoryId = categoryId;
+		this.name = name;
+		this.votes = 0;
+	}
+
 	@PrimaryGeneratedColumn()
 	id!: number;
 
 	@Column()
-	temlateId!: number;
+	templateId!: number;
 
 	@Column()
 	username!: string;

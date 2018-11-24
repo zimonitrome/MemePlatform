@@ -2,11 +2,24 @@ import {
 	Entity,
 	Column,
 	PrimaryGeneratedColumn,
-	CreateDateColumn
+	CreateDateColumn,
+	UpdateDateColumn
 } from "typeorm";
 
 @Entity()
 export class Comment {
+	constructor(
+		memeId: number,
+		username: string,
+		text: string,
+		parentCommentId?: number
+	) {
+		this.memeId = memeId;
+		this.username = username;
+		this.text = text;
+		this.parentCommentId = parentCommentId;
+	}
+
 	@PrimaryGeneratedColumn()
 	id!: number;
 
@@ -16,18 +29,15 @@ export class Comment {
 	@Column()
 	username!: string;
 
-	@Column()
-	categoryId!: number;
-
 	@Column({ nullable: true })
-	name?: string;
+	parentCommentId?: number;
 
 	@Column()
-	imageSource!: string;
-
-	@Column()
-	votes!: number;
+	text!: string;
 
 	@CreateDateColumn()
 	postDate!: Date;
+
+	@UpdateDateColumn()
+	lastEdited!: Date;
 }
