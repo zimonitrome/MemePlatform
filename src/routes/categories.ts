@@ -11,7 +11,7 @@ router.post("/", async (request, response) => {
 	try {
 		const category = new Category(request.body.name);
 		const categoryRepo = getRepository(Category);
-		const memes = await categoryRepo.save(category);
+		await categoryRepo.save(category);
 		response.status(204).end();
 	} catch (error) {
 		console.error(error); // debugging

@@ -1,6 +1,10 @@
 import express from "express";
 import memesRouter from "./routes/memes";
 import categoriesRouter from "./routes/categories";
+import usersRouter from "./routes/users";
+import memeTemplatesRouter from "./routes/memetemplates";
+import votesRouter from "./routes/votes";
+import commentsRouter from "./routes/comments";
 import { getConnection } from "typeorm";
 import connectToDB from "./repository/dbConnection";
 import insertMockData from "./repository/insertMockData";
@@ -17,6 +21,10 @@ const app = express();
 	app.use(bodyParser.json());
 	app.use("/memes", memesRouter);
 	app.use("/categories", categoriesRouter);
+	app.use("/users", usersRouter);
+	app.use("/votes", votesRouter);
+	app.use("/memetemplates", memeTemplatesRouter);
+	app.use("/comments", commentsRouter);
 
 	app.listen(port, () => console.log(`started webserver on port: ${port}`));
 })();
