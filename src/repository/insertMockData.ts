@@ -1,5 +1,4 @@
 import { getRepository, getConnection } from "typeorm";
-import connectToDB from "./dbConnection";
 import * as entities from "./entities/index";
 
 const mockTemplates = [
@@ -35,17 +34,15 @@ const mockVotes = [
 	new entities.Vote(-1, 1, "zimonitrome")
 ];
 
-connectToDB()
-	.then(() => getConnection().synchronize(true))
-	.then(() => {
-		const memeRepo = getRepository(entities.Meme);
-		memeRepo.insert(mockMemes);
-		const templateRepo = getRepository(entities.MemeTemplate);
-		templateRepo.insert(mockTemplates);
-		const userRepo = getRepository(entities.User);
-		userRepo.insert(mockUsers);
-		const commentRepo = getRepository(entities.Comment);
-		commentRepo.insert(mockComments);
-		const voteRepo = getRepository(entities.Vote);
-		voteRepo.insert(mockVotes);
-	});
+export default async () => {
+	const memeRepo = await getRepository(entities.Meme);
+	const a = await memeRepo.insert(mockMemes);
+	// const templateRepo = getRepository(entities.MemeTemplate);
+	// templateRepo.insert(mockTemplates);
+	// const userRepo = getRepository(entities.User);
+	// userRepo.insert(mockUsers);
+	// const commentRepo = getRepository(entities.Comment);
+	// commentRepo.insert(mockComments);
+	// const voteRepo = getRepository(entities.Vote);
+	// voteRepo.insert(mockVotes);
+};
