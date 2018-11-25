@@ -68,7 +68,7 @@ router.get("/:templateId", async (request, response) => {
 router.delete("/:templateId", async (request, response) => {
 	try {
 		const memeTemplateRepo = getRepository(MemeTemplate);
-		const memeTemplate = await memeTemplateRepo.delete({
+		await memeTemplateRepo.delete({
 			id: request.params.templateId
 		});
 		response.status(204).end();
