@@ -1,5 +1,6 @@
 import express from "express";
 import memesRouter from "./routes/memes";
+import categoriesRouter from "./routes/categories";
 import { getConnection } from "typeorm";
 import connectToDB from "./repository/dbConnection";
 import insertMockData from "./repository/insertMockData";
@@ -15,5 +16,7 @@ const app = express();
 
 	app.use(bodyParser.json());
 	app.use("/memes", memesRouter);
+	app.use("/categories", categoriesRouter);
+
 	app.listen(port, () => console.log(`started webserver on port: ${port}`));
 })();

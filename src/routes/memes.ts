@@ -67,4 +67,21 @@ router.get("/:memeId", async (request, response) => {
 	}
 });
 
+router.delete("/:memeId", async (request, response) => {
+	try {
+		const memeRepo = getRepository(Meme);
+		const meme = await memeRepo.delete({ id: request.params.memeId });
+		response.status(204).end();
+	} catch (error) {
+		console.error(error); // debugging
+		if (error.name === "EntityNotFound") {
+			response.status(404).end();
+		} else if (error.code === "22P02") {
+			response.status(400).json({ errorMessage: "Invalid parameter(s)." });
+		} else {
+			response.status(500).json("Internal server error.");
+		}
+	}
+});
+
 export default router;

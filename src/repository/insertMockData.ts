@@ -35,16 +35,21 @@ const mockVotes = [
 	new entities.Vote(1, 0, "Voldemorph"),
 	new entities.Vote(-1, 1, "zimonitrome")
 ];
-
+const mockCategories = [
+	new entities.Category("Sweden"),
+	new entities.Category("Gaming")
+];
 export default async () => {
 	const memeRepo = await getRepository(entities.Meme);
 	const a = await memeRepo.insert(mockMemes);
-	// const templateRepo = getRepository(entities.MemeTemplate);
-	// templateRepo.insert(mockTemplates);
-	// const userRepo = getRepository(entities.User);
-	// userRepo.insert(mockUsers);
-	// const commentRepo = getRepository(entities.Comment);
-	// commentRepo.insert(mockComments);
-	// const voteRepo = getRepository(entities.Vote);
-	// voteRepo.insert(mockVotes);
+	const templateRepo = getRepository(entities.MemeTemplate);
+	templateRepo.insert(mockTemplates);
+	const userRepo = getRepository(entities.User);
+	userRepo.insert(mockUsers);
+	const commentRepo = getRepository(entities.Comment);
+	commentRepo.insert(mockComments);
+	const voteRepo = getRepository(entities.Vote);
+	voteRepo.insert(mockVotes);
+	const categoryRepo = getRepository(entities.Category);
+	categoryRepo.insert(mockCategories);
 };
