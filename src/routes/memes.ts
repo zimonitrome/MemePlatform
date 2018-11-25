@@ -47,17 +47,15 @@ router.get("/", async (request, response) => {
 router.get("/:memeId", async (request, response) => {
 	try {
 		const memeRepo = getRepository(Meme);
-		const meme = await memeRepo.findOne({
+		const meme = await memeRepo.findOneOrFail({
 			where: { id: request.params.memeId }
 		});
-		if (meme) {
-			response.status(200).json(meme);
-		} else {
-			response.status(404).end();
-		}
+		response.status(200).json(meme);
 	} catch (error) {
 		console.error(error); // debugging
-		if (error.code === "22P02") {
+		if (error.name === "EntityNotFound") {
+			response.status(404).end();
+		} else if (error.code === "22P02") {
 			response.status(400).json({ errorMessage: "Invalid parameter(s)." });
 		} else {
 			response.status(500).json("Internal server error.");
