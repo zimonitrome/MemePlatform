@@ -1,6 +1,7 @@
 import express from "express";
-import { getRepository, Repository } from "typeorm";
+import { getRepository, Repository, Like } from "typeorm";
 import { Meme } from "../repository/entities";
+import whereQueryBuilder from "../helpers/whereQueryBuilder";
 
 const router = express.Router();
 
@@ -36,7 +37,10 @@ router.post("/", async (request, response) => {
 router.get("/", async (request, response) => {
 	try {
 		const memeRepo = getRepository(Meme);
-		const memes = await memeRepo.find();
+		const queries = ["name", "templateId", "username", "categoryId"];
+		const isSearch = ["name"];
+		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
+		const memes = await memeRepo.find({ where: whereQueries });
 		response.status(200).json(memes);
 	} catch (error) {
 		console.error(error); // debugging

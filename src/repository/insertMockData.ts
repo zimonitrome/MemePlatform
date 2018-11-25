@@ -12,7 +12,9 @@ const mockMemes = [
 	new entities.Meme(
 		0,
 		"zimonitrome",
-		"https://i.kym-cdn.com/photos/images/newsfeed/001/401/090/3e6.jpg"
+		"https://i.kym-cdn.com/photos/images/newsfeed/001/401/090/3e6.jpg",
+		undefined,
+		"hej"
 	),
 	new entities.Meme(
 		0,
