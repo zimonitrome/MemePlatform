@@ -19,6 +19,7 @@ const app = express();
 	await insertMockData();
 
 	app.use(bodyParser.json());
+	app.use(bodyParser.text()); // for where entire body is parsed as single value
 	app.use("/memes", memesRouter);
 	app.use("/categories", categoriesRouter);
 	app.use("/users", usersRouter);
