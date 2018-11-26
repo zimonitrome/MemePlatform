@@ -27,8 +27,8 @@ const mockUsers = [
 	new entities.User("Voldemorph", "i<3lenin", "salt321")
 ];
 const mockComments = [
-	new entities.Comment(0, "Voldemorph", "This meme was gay"),
-	new entities.Comment(0, "zimonitrome", "u mom gay", 0)
+	new entities.Comment(1, "Voldemorph", "This meme was gay"),
+	new entities.Comment(1, "zimonitrome", "u mom gay", 1)
 ];
 const mockVotes = [
 	new entities.Vote(1, 0, "zimonitrome"),
