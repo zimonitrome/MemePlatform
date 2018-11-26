@@ -20,7 +20,7 @@ router.post("/", async (request, response) => {
 		);
 
 		const memeRepo = getRepository(Meme);
-		const memes = await memeRepo.save(meme);
+		await memeRepo.save(meme);
 		response.status(204).end();
 	} catch (error) {
 		console.error(error); // debugging
@@ -70,7 +70,7 @@ router.get("/:memeId", async (request, response) => {
 router.delete("/:memeId", async (request, response) => {
 	try {
 		const memeRepo = getRepository(Meme);
-		const meme = await memeRepo.delete({ id: request.params.memeId });
+		await memeRepo.delete({ id: request.params.memeId });
 		response.status(204).end();
 	} catch (error) {
 		console.error(error); // debugging
