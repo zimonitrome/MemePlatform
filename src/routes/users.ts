@@ -11,6 +11,7 @@ router.post("/", async (request, response) => {
 	// TODO: validate parameters
 
 	try {
+		// TODO: Validate password before hashing it
 		var unhashedPassword = request.body.password;
 		var hashedPassword = unhashedPassword;
 		var salt = "5123sdfdsf";
