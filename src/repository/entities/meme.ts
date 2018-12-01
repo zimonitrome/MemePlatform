@@ -2,8 +2,10 @@ import {
 	Entity,
 	Column,
 	PrimaryGeneratedColumn,
-	CreateDateColumn
+	CreateDateColumn,
+	getRepository
 } from "typeorm";
+import { MemeTemplate, User, Category } from ".";
 
 @Entity()
 export class Meme {
@@ -14,11 +16,45 @@ export class Meme {
 		categoryId?: number,
 		name?: string
 	) {
-		this.templateId = templateId;
-		this.username = username;
+		// Validations
+		if (templateId) {
+			const templateRepo = getRepository(MemeTemplate);
+			if (templateRepo.find({ where: { id: templateId } })) {
+				this.templateId = templateId;
+			} else {
+				throw new Error("Template does not exist.");
+			}
+		} else {
+			throw new Error("Missing parameter templateId.");
+		}
+		if (username) {
+			const userRepo = getRepository(User);
+			if (userRepo.find({ where: { username } })) {
+				this.username = username;
+			} else {
+				throw new Error("User does not exist.");
+			}
+		} else {
+			throw new Error("Missing parameter username.");
+		}
+		// Image link should always exist, errors should be thrown beforehand
 		this.imageSource = imageSource;
-		this.categoryId = categoryId;
-		this.name = name;
+		if (categoryId) {
+			const categoryRepo = getRepository(Category);
+			if (categoryRepo.find({ where: { id: categoryId } })) {
+				this.categoryId = categoryId;
+			} else {
+				throw new Error("Category does not exist.");
+			}
+		}
+		if (name) {
+			const regexp = new RegExp(/^.{1,300}$/);
+			if (regexp.test(name)) {
+				this.name = name;
+			} else {
+				throw new Error("Given name must be between 1 and 300 characters.");
+			}
+		}
 		this.votes = 0;
 	}
 
