@@ -10,14 +10,11 @@ router.post("/", async (request, response) => {
 
 	try {
 		const username = "Voldemorph"; // TODO: get username of signed in user.
-		const vote = new Vote(
-			Math.sign(request.body.vote),
-			request.body.memeId,
-			username
-		);
+		const vote = new Vote(request.body.vote, request.body.memeId, username);
+		// TODO: Also update votes on the meme
 		const voteRepo = getRepository(Vote);
 		await voteRepo.save(vote);
-		response.status(200).end();
+		response.status(200).json(vote);
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.code === "23502") {

@@ -21,7 +21,7 @@ router.post("/", async (request, response) => {
 
 		const memeRepo = getRepository(Meme);
 		await memeRepo.save(meme);
-		response.status(204).end();
+		response.status(200).json(meme);
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.code === "23502") {

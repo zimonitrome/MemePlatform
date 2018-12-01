@@ -12,7 +12,7 @@ router.post("/", async (request, response) => {
 		const category = new Category(request.body.name);
 		const categoryRepo = getRepository(Category);
 		await categoryRepo.save(category);
-		response.status(204).end();
+		response.status(200).json(category);
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.code === "23502") {
