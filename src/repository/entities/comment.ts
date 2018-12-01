@@ -3,8 +3,10 @@ import {
 	Column,
 	PrimaryGeneratedColumn,
 	CreateDateColumn,
-	UpdateDateColumn
+	UpdateDateColumn,
+	getRepository
 } from "typeorm";
+import { User, Meme } from ".";
 
 @Entity()
 export class Comment {
@@ -14,10 +16,44 @@ export class Comment {
 		text: string,
 		parentCommentId?: number
 	) {
-		this.memeId = memeId;
-		this.username = username;
-		this.text = text;
-		this.parentCommentId = parentCommentId;
+		if (memeId) {
+			const memeRepo = getRepository(Meme);
+			if (memeRepo.find({ where: { id: memeId } })) {
+				this.memeId = memeId;
+			} else {
+				throw new Error("Meme does not exist.");
+			}
+		} else {
+			throw new Error("Missing parameter memeId.");
+		}
+		if (username) {
+			const userRepo = getRepository(User);
+			if (userRepo.find({ where: { username } })) {
+				this.username = username;
+			} else {
+				throw new Error("User does not exist.");
+			}
+		} else {
+			throw new Error("Missing parameter username.");
+		}
+		if (text) {
+			const regexp = new RegExp(/^[\s\S]{1,3000}$/);
+			if (regexp.test(text)) {
+				this.text = text;
+			} else {
+				throw new Error("Text must be between 1 and 3000 characters.");
+			}
+		} else {
+			throw new Error("Comment needs to have a text.");
+		}
+		if (parentCommentId) {
+			const commentRepo = getRepository(Comment);
+			if (commentRepo.find({ where: { id: parentCommentId } })) {
+				this.parentCommentId = parentCommentId;
+			} else {
+				throw new Error("Parent comment does not exist.");
+			}
+		}
 	}
 
 	@PrimaryGeneratedColumn()
