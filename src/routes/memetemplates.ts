@@ -68,9 +68,13 @@ router.get("/:templateId", async (request, response) => {
 router.delete("/:templateId", async (request, response) => {
 	try {
 		const memeTemplateRepo = getRepository(MemeTemplate);
-		await memeTemplateRepo.delete({
-			id: request.params.templateId
-		});
+
+		// TODO: Kom överens om hur vi ska göra här
+		await memeTemplateRepo.update(
+			{ id: request.params.templateId },
+			{ username: "", imageSource: "", name: "" }
+		);
+
 		response.status(204).end();
 	} catch (error) {
 		console.error(error); // debugging
