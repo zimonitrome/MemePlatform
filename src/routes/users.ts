@@ -1,6 +1,12 @@
 import express from "express";
 import { getRepository, Repository, Like } from "typeorm";
-import { User } from "../repository/entities";
+import {
+	User,
+	Vote,
+	MemeTemplate,
+	Meme,
+	Comment
+} from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 
 const router = express.Router();
@@ -78,6 +84,34 @@ router.delete("/:username", async (request, response) => {
 	try {
 		const userRepo = getRepository(User);
 		await userRepo.delete({ username: request.params.username });
+
+		const voteRepo = getRepository(Vote);
+		await voteRepo.delete({ username: request.params.username });
+
+		const templateRepo = getRepository(MemeTemplate);
+		await templateRepo.delete({ username: request.params.username });
+
+		const memeRepo = getRepository(Meme);
+		await memeRepo.delete({ username: request.params.username });
+
+		// Vi kanske inte ska deleta comments och children comments? Ändra text till "Comment removed"?
+		const commentRepo = getRepository(Comment);
+		const parentComments = await commentRepo.find({
+			select: ["id"],
+			where: { username: request.params.username }
+		});
+		parentComments.forEach(async comment => {
+			const childrenComments = await commentRepo.find({
+				select: ["id"],
+				where: { parentCommentId: comment.id }
+			});
+			childrenComments.forEach(async childComment => {
+				await commentRepo.delete({ id: childComment.id });
+			});
+		});
+
+		await commentRepo.delete({ username: request.params.username });
+
 		response.status(204).end();
 	} catch (error) {
 		console.error(error); // debugging
