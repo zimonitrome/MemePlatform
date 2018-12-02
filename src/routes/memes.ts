@@ -1,6 +1,6 @@
 import express from "express";
 import { getRepository, Repository, Like } from "typeorm";
-import { Meme } from "../repository/entities";
+import { Meme, Vote, Comment } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 
 const router = express.Router();
@@ -71,6 +71,13 @@ router.delete("/:memeId", async (request, response) => {
 	try {
 		const memeRepo = getRepository(Meme);
 		await memeRepo.delete({ id: request.params.memeId });
+
+		const voteRepo = getRepository(Vote);
+		await voteRepo.delete({ memeId: request.params.memeId });
+
+		const commentRepo = getRepository(Comment);
+		await commentRepo.delete({ memeId: request.params.memeId });
+
 		response.status(204).end();
 	} catch (error) {
 		console.error(error); // debugging
