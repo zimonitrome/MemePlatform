@@ -1,5 +1,5 @@
 import express from "express";
-import { getRepository, Repository, Like } from "typeorm";
+import { getRepository, Repository, Like, IsNull } from "typeorm";
 import { MemeTemplate } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 
@@ -72,7 +72,7 @@ router.delete("/:templateId", async (request, response) => {
 		// TODO: Kom överens om hur vi ska göra här
 		await memeTemplateRepo.update(
 			{ id: request.params.templateId },
-			{ username: "", imageSource: "", name: "" }
+			{ username: undefined, imageSource: undefined, name: undefined }
 		);
 
 		response.status(204).end();

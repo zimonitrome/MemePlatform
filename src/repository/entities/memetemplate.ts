@@ -28,10 +28,10 @@ export class MemeTemplate {
 	@PrimaryGeneratedColumn()
 	id!: number;
 
-	@Column()
+	@Column({ nullable: true })
 	username!: string;
 
-	@Column()
+	@Column({ nullable: true })
 	imageSource!: string;
 
 	@Column({ nullable: true })
