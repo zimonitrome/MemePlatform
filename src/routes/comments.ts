@@ -80,6 +80,16 @@ router.put("/:commentId", async (request, response) => {
 router.delete("/:commentId", async (request, response) => {
 	try {
 		const commentRepo = getRepository(Comment);
+
+		// Kill all the children
+		const childrenComments = await commentRepo.find({
+			select: ["id"],
+			where: { parentCommentId: request.params.commentId }
+		});
+		childrenComments.forEach(async childComment => {
+			await commentRepo.delete({ id: childComment.id });
+		});
+
 		await commentRepo.delete({ id: request.params.commentId });
 		response.status(204).end();
 	} catch (error) {
