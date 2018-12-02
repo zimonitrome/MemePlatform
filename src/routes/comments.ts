@@ -56,6 +56,7 @@ router.put("/:commentId", async (request, response) => {
 
 	try {
 		const commentRepo = getRepository(Comment);
+		// tslint:disable-next-line:max-line-length
 		// TODO: either change documentation to state that this consumes text and not json or send in a { text: "newcomment" } instead
 		await commentRepo.update(
 			{ id: request.params.commentId },

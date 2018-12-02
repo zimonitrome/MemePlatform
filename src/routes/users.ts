@@ -12,14 +12,14 @@ router.post("/", async (request, response) => {
 
 	try {
 		// TODO: Validate password before hashing it
-		var unhashedPassword = request.body.password;
-		var hashedPassword = unhashedPassword;
-		var salt = "5123sdfdsf";
-		//TODO: Generate hash and stuff
+		const unhashedPassword = request.body.password;
+		const hashedPassword = unhashedPassword;
+		const salt = "5123sdfdsf";
+		// TODO: Generate hash and stuff
 		const user = new User(request.body.username, unhashedPassword, salt);
 		const userRepo = getRepository(User);
 		await userRepo.save(user);
-		response.status(204).end(); //vad ska vi returnera?
+		response.status(204).end(); // vad ska vi returnera?
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.code === "23502") {
@@ -51,15 +51,15 @@ router.put("/:username", async (request, response) => {
 
 	try {
 		const userRepo = getRepository(User);
-		var unhashedPassword = request.body.password;
-		var hashedPassword = unhashedPassword;
-		var salt = "5123sdfdsf";
-		//TODO: Generate hash and stuff
+		const unhashedPassword = request.body.password;
+		const hashedPassword = unhashedPassword;
+		const salt = "5123sdfdsf";
+		// TODO: Generate hash and stuff
 		await userRepo.update(
 			{ username: request.body.username },
 			{ passwordHash: hashedPassword }
 		);
-		response.status(204).end(); //vad ska vi returnera?
+		response.status(204).end(); // vad ska vi returnera?
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.name === "EntityNotFound") {
@@ -95,7 +95,7 @@ router.post("/login-sessions", async (request, response) => {
 	// TODO: validate parameters
 
 	try {
-		//TODO: Do login stuff
+		// TODO: Do login stuff
 		const userRepo = getRepository(User);
 		response.status(204).end();
 	} catch (error) {

@@ -4,8 +4,8 @@ import { Entity, Column, PrimaryColumn } from "typeorm";
 export class User {
 	constructor(username: string, passwordHash: string, salt: string) {
 		if (username) {
-			const lenregexp = new RegExp(/^.{4,30}$/);
-			if (lenregexp.test(username)) {
+			const lengthregexp = new RegExp(/^.{4,30}$/);
+			if (lengthregexp.test(username)) {
 				const charregexp = new RegExp(/^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$/);
 				if (charregexp.test(username)) {
 					this.username = username;
