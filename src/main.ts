@@ -15,8 +15,8 @@ const app = express();
 
 (async () => {
 	await connectToDB();
-	// getConnection();
-	// await insertMockData();
+	getConnection();
+	await insertMockData();
 
 	app.use(bodyParser.json());
 	app.use(bodyParser.text()); // for where entire body is parsed as single value

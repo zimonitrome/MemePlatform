@@ -16,40 +16,58 @@ export class Meme {
 		imageSource: string,
 		name?: string
 	) {
-		// Validations
+		this.templateId = templateId;
+		this.username = username;
+		this.imageSource = imageSource;
+		this.name = name;
+		this.votes = 0;
+	}
+
+	validate() {
+		Meme.validateName(this.name);
+		Meme.validateTemplateId(this.templateId);
+		Meme.validateUsername(this.username);
+	}
+
+	static validateTemplateId(templateId: number) {
 		if (templateId) {
 			const templateRepo = getRepository(MemeTemplate);
 			if (templateRepo.find({ where: { id: templateId } })) {
-				this.templateId = templateId;
+				return;
 			} else {
 				throw new ValidationError("Template does not exist.");
 			}
 		} else {
 			throw new ValidationError("Missing parameter templateId.");
 		}
+	}
+
+	static validateUsername(username: string) {
 		if (username) {
 			const userRepo = getRepository(User);
 			if (userRepo.find({ where: { username } })) {
-				this.username = username;
+				return;
 			} else {
 				throw new ValidationError("User does not exist.");
 			}
 		} else {
 			throw new ValidationError("Missing parameter username.");
 		}
-		// Image link should always exist, ValidationErrors should be thrown beforehand
-		this.imageSource = imageSource;
+	}
+
+	static validateName(name: string | undefined) {
 		if (name) {
 			const regexp = new RegExp(/^.{1,300}$/);
 			if (regexp.test(name)) {
-				this.name = name;
+				return;
 			} else {
 				throw new ValidationError(
 					"Given name must be between 1 and 300 characters."
 				);
 			}
+		} else {
+			return;
 		}
-		this.votes = 0;
 	}
 
 	@PrimaryGeneratedColumn()

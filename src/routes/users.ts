@@ -19,6 +19,7 @@ router.post("/", async (request, response) => {
 
 	try {
 		const user = new User(request.body.username, request.body.password);
+		user.validate();
 		const userRepo = getRepository(User);
 		await userRepo.save(user);
 		response.status(204).end();
@@ -48,11 +49,15 @@ router.get("/", async (request, response) => {
 
 router.put("/:username", async (request, response) => {
 	try {
-		const updatedUser = new User(request.params.username, request.body);
+		const updatedUser = new User(
+			request.params.username,
+			request.body.password
+		);
+		updatedUser.validate();
 		const userRepo = getRepository(User);
 		await userRepo.update(
 			{ username: request.body.username },
-			{ passwordHash: updatedUser.passwordHash, salt: updatedUser.salt }
+			{ password: updatedUser.password, salt: updatedUser.salt }
 		);
 		response.status(204).end();
 	} catch (error) {

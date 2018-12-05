@@ -16,7 +16,7 @@ router.post("/", async (request, response) => {
 			request.body.text,
 			request.body.parentCommentId
 		);
-
+		comment.validate();
 		const commentRepo = getRepository(Comment);
 		const savedComment = await commentRepo.save(comment);
 		response.status(200).json(savedComment);
@@ -54,10 +54,12 @@ router.put("/:commentId", async (request, response) => {
 	try {
 		const commentRepo = getRepository(Comment);
 		// tslint:disable-next-line:max-line-length
-		// TODO: either change documentation to state that this consumes text and not json or send in a { text: "newcomment" } instead
+		// TODO: change documentation to state that this consumes a { text: "newcomment" } instead
+
+		Comment.validateText(request.body.text);
 		await commentRepo.update(
 			{ id: request.params.commentId },
-			{ text: Comment.validateText(request.body) }
+			{ text: request.body.text }
 		);
 		const updatedComment = await commentRepo.findOneOrFail({
 			id: request.params.commentId

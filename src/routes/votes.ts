@@ -12,7 +12,7 @@ router.post("/", async (request, response) => {
 	try {
 		const username = "Voldemorph"; // TODO: get username of signed in user.
 		const vote = new Vote(request.body.vote, request.body.memeId, username);
-
+		vote.validate();
 		const voteRepo = getRepository(Vote);
 		await voteRepo.save(vote);
 

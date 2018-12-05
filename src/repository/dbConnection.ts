@@ -4,7 +4,6 @@ import * as entities from "./entities";
 dotenv.config();
 
 export default async () => {
-	console.log("connects to db");
 	await createConnection({
 		type: "postgres",
 		host: process.env.DB_ENDPOINT,
@@ -20,6 +19,6 @@ export default async () => {
 			entities.MemeTemplate,
 			entities.User,
 			entities.Vote
-		] // ["../repository/entities/**/*.ts"]
+		]
 	}).catch(error => console.log(error));
 };

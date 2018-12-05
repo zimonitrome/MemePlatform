@@ -17,7 +17,7 @@ router.post("/", async (request, response) => {
 			imageSource,
 			request.body.name
 		);
-
+		memeTemplate.validate();
 		const memeTemplateRepo = getRepository(MemeTemplate);
 		const savedTemplate = await memeTemplateRepo.save(memeTemplate);
 		response.status(200).json(savedTemplate);
