@@ -5,7 +5,7 @@ import {
 	CreateDateColumn,
 	getRepository
 } from "typeorm";
-import { MemeTemplate, User, Category } from ".";
+import { MemeTemplate, User } from ".";
 
 @Entity()
 export class Meme {
@@ -13,7 +13,6 @@ export class Meme {
 		templateId: number,
 		username: string,
 		imageSource: string,
-		categoryId?: number,
 		name?: string
 	) {
 		// Validations
@@ -39,14 +38,6 @@ export class Meme {
 		}
 		// Image link should always exist, errors should be thrown beforehand
 		this.imageSource = imageSource;
-		if (categoryId) {
-			const categoryRepo = getRepository(Category);
-			if (categoryRepo.find({ where: { id: categoryId } })) {
-				this.categoryId = categoryId;
-			} else {
-				throw new Error("Category does not exist.");
-			}
-		}
 		if (name) {
 			const regexp = new RegExp(/^.{1,300}$/);
 			if (regexp.test(name)) {
@@ -66,9 +57,6 @@ export class Meme {
 
 	@Column({ nullable: true })
 	username!: string;
-
-	@Column({ nullable: true })
-	categoryId?: number;
 
 	@Column({ nullable: true })
 	name?: string;

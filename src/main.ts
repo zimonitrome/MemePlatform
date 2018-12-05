@@ -1,6 +1,5 @@
 import express from "express";
 import memesRouter from "./routes/memes";
-import categoriesRouter from "./routes/categories";
 import usersRouter from "./routes/users";
 import memeTemplatesRouter from "./routes/memetemplates";
 import votesRouter from "./routes/votes";
@@ -21,7 +20,6 @@ const app = express();
 	app.use(bodyParser.json());
 	app.use(bodyParser.text()); // for where entire body is parsed as single value
 	app.use("/memes", memesRouter);
-	app.use("/categories", categoriesRouter);
 	app.use("/users", usersRouter);
 	app.use("/votes", votesRouter);
 	app.use("/memetemplates", memeTemplatesRouter);

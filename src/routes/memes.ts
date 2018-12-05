@@ -15,7 +15,6 @@ router.post("/", async (request, response) => {
 			request.body.templateId,
 			request.body.username,
 			imageSource,
-			request.body.categoryId,
 			request.body.name
 		);
 
