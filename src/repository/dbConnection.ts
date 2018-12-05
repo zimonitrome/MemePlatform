@@ -15,7 +15,6 @@ export default async () => {
 		synchronize: true,
 		logging: false,
 		entities: [
-			entities.Category,
 			entities.Comment,
 			entities.Meme,
 			entities.MemeTemplate,
