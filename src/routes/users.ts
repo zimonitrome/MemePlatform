@@ -17,15 +17,10 @@ router.post("/", async (request, response) => {
 	// TODO: validate parameters
 
 	try {
-		// TODO: Validate password before hashing it
-		const unhashedPassword = request.body.password;
-		const hashedPassword = unhashedPassword;
-		const salt = "5123sdfdsf";
-		// TODO: Generate hash and stuff
-		const user = new User(request.body.username, unhashedPassword, salt);
+		const user = new User(request.body.username, request.body.password);
 		const userRepo = getRepository(User);
 		await userRepo.save(user);
-		response.status(204).end(); // vad ska vi returnera?
+		response.status(204).end();
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.code === "23502") {
@@ -53,19 +48,14 @@ router.get("/", async (request, response) => {
 });
 
 router.put("/:username", async (request, response) => {
-	// TODO: validate parameters
-
 	try {
+		const updatedUser = new User(request.params.username, request.body);
 		const userRepo = getRepository(User);
-		const unhashedPassword = request.body.password;
-		const hashedPassword = unhashedPassword;
-		const salt = "5123sdfdsf";
-		// TODO: Generate hash and stuff
 		await userRepo.update(
 			{ username: request.body.username },
-			{ passwordHash: hashedPassword }
+			{ passwordHash: updatedUser.passwordHash, salt: updatedUser.salt }
 		);
-		response.status(204).end(); // vad ska vi returnera?
+		response.status(204).end();
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.name === "EntityNotFound") {
@@ -83,34 +73,57 @@ router.put("/:username", async (request, response) => {
 router.delete("/:username", async (request, response) => {
 	try {
 		const userRepo = getRepository(User);
+		const voteRepo = getRepository(Vote);
+		const memeRepo = getRepository(Meme);
+		const commentRepo = getRepository(Comment);
+
 		await userRepo.delete({ username: request.params.username });
 
-		const voteRepo = getRepository(Vote);
+		// Delete all votes and updates vote count on voted memes
+		const votes = await voteRepo.find({ username: request.params.username });
 		await voteRepo.delete({ username: request.params.username });
+		votes.forEach(async vote => {
+			switch (vote.vote) {
+				case -1:
+					await memeRepo.increment({ id: vote.memeId }, "votes", 1);
+					break;
+				case 1:
+					await memeRepo.decrement({ id: vote.memeId }, "votes", 1);
+					break;
+			}
+		});
 
+		// Delete all templates made by the user and "blanks" memes made from template
 		const templateRepo = getRepository(MemeTemplate);
+		const templateMemes = await memeRepo.find({
+			templateId: request.params.templateId
+		});
 		await templateRepo.delete({ username: request.params.username });
+		templateMemes.forEach(async meme => {
+			memeRepo.update({ id: meme.id }, { templateId: undefined });
+		});
 
-		const memeRepo = getRepository(Meme);
-		await memeRepo.delete({ username: request.params.username });
-
-		// Vi kanske inte ska deleta comments och children comments? Ändra text till "Comment removed"?
-		const commentRepo = getRepository(Comment);
-		const parentComments = await commentRepo.find({
-			select: ["id"],
+		// "Blanks" memes made by the user
+		const userMemes = await memeRepo.find({
 			where: { username: request.params.username }
 		});
-		parentComments.forEach(async comment => {
-			const childrenComments = await commentRepo.find({
-				select: ["id"],
-				where: { parentCommentId: comment.id }
-			});
-			childrenComments.forEach(async childComment => {
-				await commentRepo.delete({ id: childComment.id });
-			});
+		userMemes.forEach(async meme => {
+			memeRepo.update(
+				{ id: meme.id },
+				{ username: undefined, imageSource: undefined }
+			);
 		});
 
-		await commentRepo.delete({ username: request.params.username });
+		// "Blanks" comments made by the user
+		const comments = await commentRepo.find({
+			where: { username: request.params.username }
+		});
+		comments.forEach(async comment => {
+			commentRepo.update(
+				{ id: comment.id },
+				{ username: undefined, text: undefined }
+			);
+		});
 
 		response.status(204).end();
 	} catch (error) {

@@ -1,6 +1,6 @@
 import express from "express";
 import { getRepository, Repository, Like, IsNull } from "typeorm";
-import { MemeTemplate } from "../repository/entities";
+import { MemeTemplate, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 
 const router = express.Router();
@@ -18,8 +18,8 @@ router.post("/", async (request, response) => {
 		);
 
 		const memeTemplateRepo = getRepository(MemeTemplate);
-		await memeTemplateRepo.save(memeTemplate);
-		response.status(204).end();
+		const savedTemplate = await memeTemplateRepo.save(memeTemplate);
+		response.status(200).json(savedTemplate);
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.code === "23502") {
@@ -67,13 +67,17 @@ router.get("/:templateId", async (request, response) => {
 
 router.delete("/:templateId", async (request, response) => {
 	try {
-		const memeTemplateRepo = getRepository(MemeTemplate);
+		// "Blanks" templateId in all memes made from template
+		const memeRepo = getRepository(Meme);
+		const memes = await memeRepo.find({
+			templateId: request.params.templateId
+		});
+		memes.forEach(async meme => {
+			memeRepo.update({ id: meme.id }, { templateId: undefined });
+		});
 
-		// TODO: Kom överens om hur vi ska göra här
-		await memeTemplateRepo.update(
-			{ id: request.params.templateId },
-			{ username: undefined, imageSource: undefined, name: undefined }
-		);
+		const memeTemplateRepo = getRepository(MemeTemplate);
+		await memeTemplateRepo.delete({ id: request.params.templateId });
 
 		response.status(204).end();
 	} catch (error) {

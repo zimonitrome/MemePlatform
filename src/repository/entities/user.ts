@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class User {
-	constructor(username: string, passwordHash: string, salt: string) {
+	constructor(username: string, password: string) {
 		if (username) {
 			const lengthregexp = new RegExp(/^.{4,30}$/);
 			if (lengthregexp.test(username)) {
@@ -21,8 +21,27 @@ export class User {
 		} else {
 			throw new Error("Missing parameter username.");
 		}
-		this.passwordHash = passwordHash;
-		this.salt = salt;
+
+		if (password) {
+			const lengthregexp = new RegExp(/^.{8,30}$/);
+			if (lengthregexp.test(password)) {
+				const charregexp = new RegExp(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]*$/);
+				if (charregexp.test(password)) {
+					// TODO: Hash password
+					this.passwordHash = password;
+					// TODO: Generate salt
+					this.salt = "5123sdfdsf";
+				} else {
+					throw new Error(
+						"Password must contain at least one letter and one number."
+					);
+				}
+			} else {
+				throw new Error("Password must be between 8 and 30 characters long.");
+			}
+		} else {
+			throw new Error("Missing parameter password.");
+		}
 	}
 
 	@PrimaryColumn()

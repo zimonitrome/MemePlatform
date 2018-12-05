@@ -61,10 +61,10 @@ export class Meme {
 	@PrimaryGeneratedColumn()
 	id!: number;
 
-	@Column()
+	@Column({ nullable: true })
 	templateId!: number;
 
-	@Column()
+	@Column({ nullable: true })
 	username!: string;
 
 	@Column({ nullable: true })
@@ -73,7 +73,7 @@ export class Meme {
 	@Column({ nullable: true })
 	name?: string;
 
-	@Column()
+	@Column({ nullable: true })
 	imageSource!: string;
 
 	@Column()

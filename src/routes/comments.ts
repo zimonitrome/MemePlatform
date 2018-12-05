@@ -17,8 +17,8 @@ router.post("/", async (request, response) => {
 		);
 
 		const commentRepo = getRepository(Comment);
-		await commentRepo.save(comment);
-		response.status(200).json(comment);
+		const savedComment = await commentRepo.save(comment);
+		response.status(200).json(savedComment);
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.code === "23502") {
@@ -52,17 +52,18 @@ router.get("/:memeId", async (request, response) => {
 });
 
 router.put("/:commentId", async (request, response) => {
-	// TODO: validate parameters
-
 	try {
 		const commentRepo = getRepository(Comment);
 		// tslint:disable-next-line:max-line-length
 		// TODO: either change documentation to state that this consumes text and not json or send in a { text: "newcomment" } instead
 		await commentRepo.update(
 			{ id: request.params.commentId },
-			{ text: request.body }
+			{ text: Comment.validateText(request.body) }
 		);
-		response.status(204).end();
+		const updatedComment = await commentRepo.findOneOrFail({
+			id: request.params.commentId
+		});
+		response.status(204).json(updatedComment);
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.name === "EntityNotFound") {
@@ -80,17 +81,10 @@ router.put("/:commentId", async (request, response) => {
 router.delete("/:commentId", async (request, response) => {
 	try {
 		const commentRepo = getRepository(Comment);
-
-		// Kill all the children
-		const childrenComments = await commentRepo.find({
-			select: ["id"],
-			where: { parentCommentId: request.params.commentId }
-		});
-		childrenComments.forEach(async childComment => {
-			await commentRepo.delete({ id: childComment.id });
-		});
-
-		await commentRepo.delete({ id: request.params.commentId });
+		await commentRepo.update(
+			{ id: request.params.commentId },
+			{ text: undefined, username: undefined }
+		);
 		response.status(204).end();
 	} catch (error) {
 		console.error(error); // debugging

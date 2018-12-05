@@ -20,8 +20,8 @@ router.post("/", async (request, response) => {
 		);
 
 		const memeRepo = getRepository(Meme);
-		await memeRepo.save(meme);
-		response.status(200).json(meme);
+		const savedMeme = await memeRepo.save(meme);
+		response.status(200).json(savedMeme);
 	} catch (error) {
 		console.error(error); // debugging
 		if (error.code === "23502") {
@@ -70,13 +70,10 @@ router.get("/:memeId", async (request, response) => {
 router.delete("/:memeId", async (request, response) => {
 	try {
 		const memeRepo = getRepository(Meme);
-		await memeRepo.delete({ id: request.params.memeId });
-
-		const voteRepo = getRepository(Vote);
-		await voteRepo.delete({ memeId: request.params.memeId });
-
-		const commentRepo = getRepository(Comment);
-		await commentRepo.delete({ memeId: request.params.memeId });
+		await memeRepo.update(
+			{ id: request.params.memeId },
+			{ imageSource: undefined, username: undefined, templateId: undefined }
+		);
 
 		response.status(204).end();
 	} catch (error) {

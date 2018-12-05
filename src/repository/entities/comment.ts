@@ -36,16 +36,7 @@ export class Comment {
 		} else {
 			throw new Error("Missing parameter username.");
 		}
-		if (text) {
-			const regexp = new RegExp(/^[\s\S]{1,3000}$/);
-			if (regexp.test(text)) {
-				this.text = text;
-			} else {
-				throw new Error("Text must be between 1 and 3000 characters.");
-			}
-		} else {
-			throw new Error("Comment needs to have a text.");
-		}
+		this.text = Comment.validateText(text);
 		if (parentCommentId) {
 			const commentRepo = getRepository(Comment);
 			if (commentRepo.find({ where: { id: parentCommentId } })) {
@@ -56,19 +47,32 @@ export class Comment {
 		}
 	}
 
+	static validateText(text: string): string {
+		if (text) {
+			const regexp = new RegExp(/^[\s\S]{1,3000}$/);
+			if (regexp.test(text)) {
+				return text;
+			} else {
+				throw new Error("Text must be between 1 and 3000 characters.");
+			}
+		} else {
+			throw new Error("Comment needs to have a text.");
+		}
+	}
+
 	@PrimaryGeneratedColumn()
 	id!: number;
 
 	@Column()
 	memeId!: number;
 
-	@Column()
+	@Column({ nullable: true })
 	username!: string;
 
 	@Column({ nullable: true })
 	parentCommentId?: number;
 
-	@Column()
+	@Column({ nullable: true })
 	text!: string;
 
 	@CreateDateColumn()

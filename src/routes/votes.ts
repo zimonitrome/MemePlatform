@@ -11,16 +11,21 @@ router.post("/", async (request, response) => {
 	try {
 		const username = "Voldemorph"; // TODO: get username of signed in user.
 		const vote = new Vote(request.body.vote, request.body.memeId, username);
-		// TODO: Also update votes on the meme
+
 		const voteRepo = getRepository(Vote);
 		await voteRepo.save(vote);
 
+		// Also updates votecount on meme
 		const memeRepo = getRepository(Meme);
-		await memeRepo.update(
-			{ id: request.body.memeId },
-			{ votes: +request.body.vote }
-		);
 
+		switch (vote.vote) {
+			case 1:
+				await memeRepo.increment({ id: vote.memeId }, "votes", 1);
+				break;
+			case -1:
+				await memeRepo.decrement({ id: vote.memeId }, "votes", 1);
+				break;
+		}
 		response.status(200).json(vote);
 	} catch (error) {
 		console.error(error); // debugging
@@ -56,22 +61,26 @@ router.get("/", async (request, response) => {
 
 router.delete("/:memeId", async (request, response) => {
 	try {
-		const voteRepo = getRepository(Vote);
 		const user = "Voldemorph"; // TODO: get username of signed in user.
 
-		const memeRepo = getRepository(Meme);
-		const vote = await voteRepo.find({
-			select: ["vote"],
+		const voteRepo = getRepository(Vote);
+		const vote = await voteRepo.findOneOrFail({
 			where: { memeId: request.params.memeId }
 		});
-
-		const voteSign = vote[0];
-		await memeRepo.update({ id: request.params.memeId }, { votes: -voteSign });
-
 		await voteRepo.delete({
 			memeId: request.params.memeId,
 			username: user
 		});
+
+		const memeRepo = getRepository(Meme);
+		switch (vote.vote) {
+			case -1:
+				await memeRepo.increment({ id: vote.memeId }, "votes", 1);
+				break;
+			case 1:
+				await memeRepo.decrement({ id: vote.memeId }, "votes", 1);
+				break;
+		}
 
 		response.status(204).end();
 	} catch (error) {
