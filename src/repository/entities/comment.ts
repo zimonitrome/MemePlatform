@@ -7,6 +7,7 @@ import {
 	getRepository
 } from "typeorm";
 import { User, Meme } from ".";
+import { ValidationError } from "../../helpers/ValidationError";
 
 @Entity()
 export class Comment {
@@ -21,20 +22,20 @@ export class Comment {
 			if (memeRepo.find({ where: { id: memeId } })) {
 				this.memeId = memeId;
 			} else {
-				throw new Error("Meme does not exist.");
+				throw new ValidationError("Meme does not exist.");
 			}
 		} else {
-			throw new Error("Missing parameter memeId.");
+			throw new ValidationError("Missing parameter memeId.");
 		}
 		if (username) {
 			const userRepo = getRepository(User);
 			if (userRepo.find({ where: { username } })) {
 				this.username = username;
 			} else {
-				throw new Error("User does not exist.");
+				throw new ValidationError("User does not exist.");
 			}
 		} else {
-			throw new Error("Missing parameter username.");
+			throw new ValidationError("Missing parameter username.");
 		}
 		this.text = Comment.validateText(text);
 		if (parentCommentId) {
@@ -42,7 +43,7 @@ export class Comment {
 			if (commentRepo.find({ where: { id: parentCommentId } })) {
 				this.parentCommentId = parentCommentId;
 			} else {
-				throw new Error("Parent comment does not exist.");
+				throw new ValidationError("Parent comment does not exist.");
 			}
 		}
 	}
@@ -53,10 +54,12 @@ export class Comment {
 			if (regexp.test(text)) {
 				return text;
 			} else {
-				throw new Error("Text must be between 1 and 3000 characters.");
+				throw new ValidationError(
+					"Text must be between 1 and 3000 characters."
+				);
 			}
 		} else {
-			throw new Error("Comment needs to have a text.");
+			throw new ValidationError("Comment needs to have a text.");
 		}
 	}
 

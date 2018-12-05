@@ -15,7 +15,7 @@
 		"encoding": true,
 		"no-trailing-whitespace": true,
 		"object-literal-key-quotes": [true, "as-needed"],
-		"interface-name": [true, "always-prefix"],
+		"interface-name": [true, "never-prefix"],
 		"file-name-casing": false,
 		"prefer-conditional-expression": true,
 		"prefer-object-spread": true,
