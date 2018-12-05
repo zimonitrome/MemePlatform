@@ -5,13 +5,13 @@ import { ValidationError } from "../../helpers/ValidationError";
 export class User {
 	constructor(username: string, password: string) {
 		this.username = username;
-		this.password = password;
+		this.passwordHash = password;
 		this.salt = "bajs";
 	}
 
 	validate() {
 		User.validateUsername(this.username);
-		User.validatePassword(this.password);
+		User.validatePassword(this.passwordHash);
 	}
 
 	static validateUsername(username: string) {
@@ -46,7 +46,7 @@ export class User {
 					return;
 				} else {
 					throw new ValidationError(
-						"Password must contain at least one letter and one number."
+						"Password must contain at least one letter and one number, and must only contain letters or numbers."
 					);
 				}
 			} else {
@@ -63,7 +63,7 @@ export class User {
 	username!: string;
 
 	@Column()
-	password!: string;
+	passwordHash!: string;
 
 	@Column()
 	salt!: string;

@@ -57,7 +57,7 @@ router.put("/:username", async (request, response) => {
 		const userRepo = getRepository(User);
 		await userRepo.update(
 			{ username: request.body.username },
-			{ password: updatedUser.password, salt: updatedUser.salt }
+			{ passwordHash: updatedUser.passwordHash, salt: updatedUser.salt }
 		);
 		response.status(204).end();
 	} catch (error) {

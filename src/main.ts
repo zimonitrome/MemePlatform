@@ -9,13 +9,12 @@ import connectToDB from "./repository/dbConnection";
 import insertMockData from "./repository/insertMockData";
 import bodyParser from "body-parser";
 
-Error.stackTraceLimit = Infinity;
 const port = process.env.PORT || 80;
 const app = express();
 
 (async () => {
 	await connectToDB();
-	getConnection();
+	await getConnection().synchronize(true); // does the thing
 	await insertMockData();
 
 	app.use(bodyParser.json());
