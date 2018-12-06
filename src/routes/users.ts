@@ -9,17 +9,23 @@ import {
 } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
+import { hash } from "bcrypt";
 
 const router = express.Router();
+const hashRounds = 6;
 
 export default router;
 
 router.post("/", async (request, response) => {
-	// TODO: validate parameters
-
 	try {
-		const user = new User(request.body.username, request.body.password);
-		user.validate();
+		User.validatePassword(request.body.password);
+		User.validateUsername(request.body.username);
+
+		const user = new User(
+			request.body.username,
+			await hash(request.body.password, hashRounds)
+		);
+
 		const userRepo = getRepository(User);
 		await userRepo.save(user);
 		response.status(204).end();
@@ -49,15 +55,15 @@ router.get("/", async (request, response) => {
 
 router.put("/:username", async (request, response) => {
 	try {
+		User.validatePassword(request.body.password);
 		const updatedUser = new User(
 			request.params.username,
-			request.body.password
+			await hash(request.body.password, hashRounds)
 		);
-		updatedUser.validate();
 		const userRepo = getRepository(User);
 		await userRepo.update(
 			{ username: request.body.username },
-			{ passwordHash: updatedUser.passwordHash, salt: updatedUser.salt }
+			{ passwordHash: updatedUser.passwordHash }
 		);
 		response.status(204).end();
 	} catch (error) {
@@ -141,8 +147,6 @@ router.delete("/:username", async (request, response) => {
 });
 
 router.post("/login-sessions", async (request, response) => {
-	// TODO: validate parameters
-
 	try {
 		// TODO: Do login stuff
 		const userRepo = getRepository(User);

@@ -6,7 +6,6 @@ export class User {
 	constructor(username: string, password: string) {
 		this.username = username;
 		this.passwordHash = password;
-		this.salt = "bajs";
 	}
 
 	validate() {
@@ -64,7 +63,4 @@ export class User {
 
 	@Column()
 	passwordHash!: string;
-
-	@Column()
-	salt!: string;
 }
