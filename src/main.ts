@@ -4,10 +4,11 @@ import usersRouter from "./routes/users";
 import memeTemplatesRouter from "./routes/memetemplates";
 import votesRouter from "./routes/votes";
 import commentsRouter from "./routes/comments";
+import sessionsRouter from "./routes/sessions";
 import { getConnection } from "typeorm";
 import connectToDB from "./repository/dbConnection";
 import insertMockData from "./repository/insertMockData";
-import bodyParser from "body-parser";
+import bodyParser, { urlencoded } from "body-parser";
 
 const port = process.env.PORT || 80;
 const app = express();
@@ -18,12 +19,14 @@ const app = express();
 	await insertMockData();
 
 	app.use(bodyParser.json());
-	app.use(bodyParser.text()); // for where entire body is parsed as single value
+	app.use(bodyParser.text()); // for where entire body is parsed as single value // TODO: probably remove
+	app.use(bodyParser.urlencoded({ extended: false }));
 	app.use("/memes", memesRouter);
 	app.use("/users", usersRouter);
 	app.use("/votes", votesRouter);
 	app.use("/memetemplates", memeTemplatesRouter);
 	app.use("/comments", commentsRouter);
+	app.use("/sessions", sessionsRouter);
 
 	app.listen(port, () => console.log(`started webserver on port: ${port}`));
 })();
