@@ -145,18 +145,3 @@ router.delete("/:username", async (request, response) => {
 		}
 	}
 });
-
-router.post("/login-sessions", async (request, response) => {
-	try {
-		// TODO: Do login stuff
-		const userRepo = getRepository(User);
-		response.status(204).end();
-	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else {
-			response.status(500).end();
-		}
-	}
-});

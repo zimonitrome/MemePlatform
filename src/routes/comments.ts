@@ -3,6 +3,7 @@ import { getRepository, Repository, Like } from "typeorm";
 import { Comment } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
+import { authenticate } from "../helpers/authenticationHelpers";
 
 const router = express.Router();
 
@@ -10,12 +11,15 @@ router.post("/", async (request, response) => {
 	// TODO: validate parameters
 
 	try {
+		authenticate(request.headers.authorization, request.body.username);
+
 		const comment = new Comment(
 			request.body.memeId,
 			request.body.username,
 			request.body.text,
 			request.body.parentCommentId
 		);
+
 		comment.validate();
 		const commentRepo = getRepository(Comment);
 		const savedComment = await commentRepo.save(comment);
@@ -52,9 +56,12 @@ router.get("/:memeId", async (request, response) => {
 
 router.put("/:commentId", async (request, response) => {
 	try {
-		const commentRepo = getRepository(Comment);
-		// tslint:disable-next-line:max-line-length
 		// TODO: change documentation to state that this consumes a { text: "newcomment" } instead
+		const commentRepo = getRepository(Comment);
+		const comment = await commentRepo.findOneOrFail({
+			id: request.params.commentId
+		});
+		authenticate(request.headers.authorization, comment.username);
 
 		Comment.validateText(request.body.text);
 		await commentRepo.update(
@@ -64,7 +71,8 @@ router.put("/:commentId", async (request, response) => {
 		const updatedComment = await commentRepo.findOneOrFail({
 			id: request.params.commentId
 		});
-		response.status(204).json(updatedComment);
+
+		response.status(200).json(updatedComment);
 	} catch (error) {
 		console.error(error); // debugging
 		if (error instanceof ValidationError) {
@@ -80,6 +88,11 @@ router.put("/:commentId", async (request, response) => {
 router.delete("/:commentId", async (request, response) => {
 	try {
 		const commentRepo = getRepository(Comment);
+		const comment = await commentRepo.findOneOrFail({
+			id: request.params.commentId
+		});
+
+		authenticate(request.headers.authorization, comment.username);
 		await commentRepo.update(
 			{ id: request.params.commentId },
 			{ text: undefined, username: undefined }
