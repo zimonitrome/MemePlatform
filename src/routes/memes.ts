@@ -3,6 +3,7 @@ import { getRepository, Repository, Like } from "typeorm";
 import { Meme, Vote, Comment } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
+import { authenticate } from "../helpers/authenticationHelpers";
 
 const router = express.Router();
 
@@ -10,6 +11,8 @@ router.post("/", async (request, response) => {
 	// TODO: validate parameters
 
 	try {
+		authenticate(request.headers.authorization, request.body.username);
+
 		// TODO: Generate meme image here
 		const imageSource = "https://i.redd.it/po71lilrehky.jpg"; // temp
 		const meme = new Meme(
@@ -68,6 +71,10 @@ router.get("/:memeId", async (request, response) => {
 router.delete("/:memeId", async (request, response) => {
 	try {
 		const memeRepo = getRepository(Meme);
+
+		const meme = await memeRepo.findOneOrFail({ id: request.params.memeId });
+		authenticate(request.headers.authorization, meme.username);
+
 		await memeRepo.update(
 			{ id: request.params.memeId },
 			{ imageSource: undefined, username: undefined, templateId: undefined }

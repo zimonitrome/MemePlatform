@@ -3,16 +3,20 @@ import { getRepository, Repository, Like } from "typeorm";
 import { Vote, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
+import { authenticate } from "../helpers/authenticationHelpers";
 
 const router = express.Router();
 
 router.post("/", async (request, response) => {
-	// TODO: validate parameters
-
 	try {
-		const username = "Voldemorph"; // TODO: get username of signed in user.
-		const vote = new Vote(request.body.vote, request.body.memeId, username);
+		authenticate(request.headers.authorization, request.body.username);
+		const vote = new Vote(
+			request.body.vote,
+			request.body.memeId,
+			request.body.username
+		);
 		vote.validate();
+
 		const voteRepo = getRepository(Vote);
 		await voteRepo.save(vote);
 
@@ -60,15 +64,16 @@ router.get("/", async (request, response) => {
 
 router.delete("/:memeId", async (request, response) => {
 	try {
-		const user = "Voldemorph"; // TODO: get username of signed in user.
-
 		const voteRepo = getRepository(Vote);
 		const vote = await voteRepo.findOneOrFail({
 			where: { memeId: request.params.memeId }
 		});
+
+		authenticate(request.headers.authorization, vote.username);
+
 		await voteRepo.delete({
 			memeId: request.params.memeId,
-			username: user
+			username: vote.username
 		});
 
 		const memeRepo = getRepository(Meme);

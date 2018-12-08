@@ -3,6 +3,7 @@ import { getRepository, Repository, Like, IsNull } from "typeorm";
 import { MemeTemplate, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
+import { authenticate } from "../helpers/authenticationHelpers";
 
 const router = express.Router();
 
@@ -10,8 +11,10 @@ router.post("/", async (request, response) => {
 	// TODO: validate parameters
 
 	try {
+		authenticate(request.headers.authorization, request.body.username);
+
 		const imageSource =
-			"https://i.kym-cdn.com/entries/icons/mobile/000/026/913/excuse.jpg"; // temp
+			"https://i.kym-cdn.com/entries/icons/mobile/000/026/913/excuse.jpg"; // TODO: temp
 		const memeTemplate = new MemeTemplate(
 			request.body.username,
 			imageSource,
@@ -66,6 +69,12 @@ router.get("/:templateId", async (request, response) => {
 
 router.delete("/:templateId", async (request, response) => {
 	try {
+		const memeTemplateRepo = getRepository(MemeTemplate);
+		const memeTemplate = await memeTemplateRepo.findOneOrFail({
+			id: request.params.templateId
+		});
+		authenticate(request.headers.authorization, memeTemplate.username);
+
 		// "Blanks" templateId in all memes made from template
 		const memeRepo = getRepository(Meme);
 		const memes = await memeRepo.find({
@@ -75,7 +84,6 @@ router.delete("/:templateId", async (request, response) => {
 			memeRepo.update({ id: meme.id }, { templateId: undefined });
 		});
 
-		const memeTemplateRepo = getRepository(MemeTemplate);
 		await memeTemplateRepo.delete({ id: request.params.templateId });
 
 		response.status(204).end();

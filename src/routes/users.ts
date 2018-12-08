@@ -10,6 +10,7 @@ import {
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
 import { hash } from "bcrypt";
+import { authenticate } from "../helpers/authenticationHelpers";
 
 const router = express.Router();
 const hashRounds = 6;
@@ -55,6 +56,9 @@ router.get("/", async (request, response) => {
 
 router.put("/:username", async (request, response) => {
 	try {
+		// TODO: Maybe update docs idk?
+		authenticate(request.headers.authorization, request.params.username);
+
 		User.validatePassword(request.body.password);
 		const updatedUser = new User(
 			request.params.username,
@@ -62,7 +66,7 @@ router.put("/:username", async (request, response) => {
 		);
 		const userRepo = getRepository(User);
 		await userRepo.update(
-			{ username: request.body.username },
+			{ username: request.params.username },
 			{ passwordHash: updatedUser.passwordHash }
 		);
 		response.status(204).end();
@@ -80,6 +84,8 @@ router.put("/:username", async (request, response) => {
 
 router.delete("/:username", async (request, response) => {
 	try {
+		authenticate(request.headers.authorization, request.params.username);
+
 		const userRepo = getRepository(User);
 		const voteRepo = getRepository(Vote);
 		const memeRepo = getRepository(Meme);
