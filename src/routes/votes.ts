@@ -42,13 +42,17 @@ router.post("/", async (request, response) => {
 	}
 });
 
-router.get("/", async (request, response) => {
-	// TODO: validate parameters, require both memeId and username
+router.get("/:memeId", async (request, response) => {
 	try {
+		Vote.validateMemeId(request.params.memeId);
+		Vote.validateUsername(request.body.username);
+
 		const voteRepo = getRepository(Vote);
-		const queries = ["memeId", "username"];
-		const whereQueries = whereQueryBuilder(request.query, queries);
-		const vote = await voteRepo.find({ where: whereQueries });
+
+		const vote = await voteRepo.findOneOrFail({
+			memeId: request.body.memeId,
+			username: request.body.username
+		});
 		response.status(200).json(vote);
 	} catch (error) {
 		console.error(error); // debugging
@@ -65,15 +69,16 @@ router.get("/", async (request, response) => {
 router.delete("/:memeId", async (request, response) => {
 	try {
 		const voteRepo = getRepository(Vote);
-		const vote = await voteRepo.findOneOrFail({
-			where: { memeId: request.params.memeId }
-		});
 
-		authenticate(request.headers.authorization, vote.username);
+		authenticate(request.headers.authorization, request.body.username);
+
+		const vote = await voteRepo.findOneOrFail({
+			where: { memeId: request.params.memeId, username: request.body.username }
+		});
 
 		await voteRepo.delete({
 			memeId: request.params.memeId,
-			username: vote.username
+			username: request.body.username
 		});
 
 		const memeRepo = getRepository(Meme);

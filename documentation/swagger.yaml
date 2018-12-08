@@ -6,56 +6,54 @@ info:
 host: "TBA"
 
 tags:
-- name: "users"
-  description: "Registered users"
-- name: "memes"
-  description: "Created meme posts"
-- name: "templates"
-  description: "Template images"
-- name: "comments"
-  description: "Comments on meme posts"
-- name: "categories"
-  description: "Categories of memes"
-  
+  - name: "users"
+    description: "Registered users"
+  - name: "memes"
+    description: "Created meme posts"
+  - name: "templates"
+    description: "Template images"
+  - name: "comments"
+    description: "Comments on meme posts"
+  - name: "categories"
+    description: "Categories of memes"
+
 paths:
   # ============== USERS ==============
   /users:
     post:
       tags:
-      - "users"
+        - "users"
       summary: "Register a new user"
       consumes:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "User to be registered"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
+        - in: "body"
+          name: "body"
+          description: "User to be registered"
+          required: true
+          schema:
+            $ref: "#/definitions/User"
       responses:
         204:
           description: "User successfully registered"
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
-        409:
-          description: "User already exists"
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
     get:
       tags:
-      - "users"
+        - "users"
       summary: "Get a list of usernames"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "name"
-        in: "query"
-        description: "search query for usernames"
-        required: false
-        type: "string"
+        - name: "name"
+          in: "query"
+          description: "search query for usernames"
+          required: false
+          type: "string"
       responses:
         200:
           description: "Users successfully fetched"
@@ -74,20 +72,20 @@ paths:
   /users/{username}:
     put:
       tags:
-      - "users"
+        - "users"
       summary: "Edits a user"
       parameters:
-      - name: "username"
-        in: "path"
-        description: "username of the user to edit"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "password"
-        description: "new password to update"
-        required: true
-        schema:
+        - name: "username"
+          in: "path"
+          description: "username of the user to edit"
+          required: true
           type: "string"
+        - in: "body"
+          name: "password"
+          description: "new password to update"
+          required: true
+          schema:
+            type: "string"
       responses:
         204:
           description: "User successfully edited"
@@ -101,14 +99,14 @@ paths:
           description: "Internal Server Error"
     delete:
       tags:
-      - "users"
+        - "users"
       summary: "Removes a user"
       parameters:
-      - name: "username"
-        in: "path"
-        description: "username of the user to delete"
-        required: true
-        type: "string"
+        - name: "username"
+          in: "path"
+          description: "username of the user to delete"
+          required: true
+          type: "string"
       responses:
         204:
           description: "User successfully removed"
@@ -123,17 +121,17 @@ paths:
   /users/login-sessions:
     post:
       tags:
-      - "users"
+        - "users"
       summary: "Creates a new login session"
       consumes:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "User to be logged in"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
+        - in: "body"
+          name: "body"
+          description: "User to be logged in"
+          required: true
+          schema:
+            $ref: "#/definitions/User"
       responses:
         204:
           description: "User successfully logged in"
@@ -143,20 +141,20 @@ paths:
             type: "string"
         500:
           description: "Internal Server Error"
-  
+
   # ============== MEMES ==============
   /memes:
     post:
       tags:
-      - "memes"
+        - "memes"
       summary: "Post a new meme"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "Meme to be posted"
-        required: true
-        schema:
-          $ref: "#/definitions/NewMeme"
+        - in: "body"
+          name: "body"
+          description: "Meme to be posted"
+          required: true
+          schema:
+            $ref: "#/definitions/NewMeme"
       responses:
         204:
           description: "Meme successfully posted"
@@ -168,29 +166,29 @@ paths:
           description: "Internal Server Error"
     get:
       tags:
-      - "memes"
+        - "memes"
       summary: "Get a list of memes"
       parameters:
-      - name: "name"
-        in: "query"
-        description: "search query for names"
-        required: false
-        type: "string"
-      - name: "templateId"
-        in: "query"
-        description: "ID of template to get memes by"
-        required: false
-        type: "string"
-      - name: "username"
-        in: "query"
-        description: "name of user to get memes by"
-        required: false
-        type: "string"
-      - name: "categoryId"
-        in: "query"
-        description: "ID of category to get memes by"
-        required: false
-        type: "string"
+        - name: "name"
+          in: "query"
+          description: "search query for names"
+          required: false
+          type: "string"
+        - name: "templateId"
+          in: "query"
+          description: "ID of template to get memes by"
+          required: false
+          type: "string"
+        - name: "username"
+          in: "query"
+          description: "name of user to get memes by"
+          required: false
+          type: "string"
+        - name: "categoryId"
+          in: "query"
+          description: "ID of category to get memes by"
+          required: false
+          type: "string"
       responses:
         200:
           description: "Memes successfully fetched"
@@ -209,14 +207,14 @@ paths:
   /memes/{memeId}:
     get:
       tags:
-      - "memes"
+        - "memes"
       summary: "Get a meme"
       parameters:
-      - name: "memeId"
-        in: "path"
-        description: "id of the meme to get"
-        required: true
-        type: "integer"
+        - name: "memeId"
+          in: "path"
+          description: "id of the meme to get"
+          required: true
+          type: "integer"
       responses:
         200:
           description: "Meme successfully fetched"
@@ -232,14 +230,14 @@ paths:
           description: "Internal Server Error"
     delete:
       tags:
-      - "memes"
+        - "memes"
       summary: "Delete a meme"
       parameters:
-      - name: "memeId"
-        in: "path"
-        description: "id of the meme to delete"
-        required: true
-        type: "integer"
+        - name: "memeId"
+          in: "path"
+          description: "id of the meme to delete"
+          required: true
+          type: "integer"
       responses:
         204:
           description: "Meme successfully removed"
@@ -249,20 +247,20 @@ paths:
             type: "string"
         500:
           description: "Internal Server Error"
-      
+
   # ============== TEMPLATES ==============
   /templates:
     post:
       tags:
-      - "templates"
+        - "templates"
       summary: "Create a new meme template"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "Template to be created"
-        required: true
-        schema:
-          $ref: "#/definitions/NewMemeTemplate"
+        - in: "body"
+          name: "body"
+          description: "Template to be created"
+          required: true
+          schema:
+            $ref: "#/definitions/NewMemeTemplate"
       responses:
         204:
           description: "Template successfully posted"
@@ -274,19 +272,19 @@ paths:
           description: "Internal Server Error"
     get:
       tags:
-      - "templates"
+        - "templates"
       summary: "Get a list of meme templates"
       parameters:
-      - name: "username"
-        in: "query"
-        description: "name of user to get templates by"
-        required: false
-        type: "string"
-      - name: "name"
-        in: "query"
-        description: "search query for names"
-        required: false
-        type: "string"
+        - name: "username"
+          in: "query"
+          description: "name of user to get templates by"
+          required: false
+          type: "string"
+        - name: "name"
+          in: "query"
+          description: "search query for names"
+          required: false
+          type: "string"
       responses:
         200:
           description: "Templates successfully fetched"
@@ -305,14 +303,14 @@ paths:
   /templates/{templateId}:
     get:
       tags:
-      - "templates"
+        - "templates"
       summary: "Get a template"
       parameters:
-      - name: "templateId"
-        in: "path"
-        description: "id of the template to get"
-        required: true
-        type: "integer"
+        - name: "templateId"
+          in: "path"
+          description: "id of the template to get"
+          required: true
+          type: "integer"
       responses:
         200:
           description: "Template successfully fetched"
@@ -328,14 +326,14 @@ paths:
           description: "Internal Server Error"
     delete:
       tags:
-      - "templates"
+        - "templates"
       summary: "Delete a template"
       parameters:
-      - name: "templateId"
-        in: "path"
-        description: "id of the template to delete"
-        required: true
-        type: "integer"
+        - name: "templateId"
+          in: "path"
+          description: "id of the template to delete"
+          required: true
+          type: "integer"
       responses:
         204:
           description: "Template successfully removed"
@@ -345,19 +343,19 @@ paths:
             type: "string"
         500:
           description: "Internal Server Error"
-        
+
   # ============== COMMENTS ==============
   /comments/{memeId}:
     get:
       tags:
-      - "comments"
+        - "comments"
       summary: "Get all comments on a meme"
       parameters:
-      - name: "memeId"
-        in: "path"
-        description: "Id of meme to get comments of"
-        required: true
-        type: "string"
+        - name: "memeId"
+          in: "path"
+          description: "Id of meme to get comments of"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Comments successfully fetched"
@@ -376,15 +374,15 @@ paths:
   /comments:
     post:
       tags:
-      - "comments"
+        - "comments"
       summary: "Comment on a meme"
       parameters:
-      - in: "body"
-        name: "body"
-        description: "Comment to be added"
-        required: true
-        schema:
-          $ref: "#/definitions/NewComment"
+        - in: "body"
+          name: "body"
+          description: "Comment to be added"
+          required: true
+          schema:
+            $ref: "#/definitions/NewComment"
       responses:
         204:
           description: "Comment successfully posted"
@@ -397,20 +395,20 @@ paths:
   /comments/{commentId}:
     put:
       tags:
-      - "comments"
+        - "comments"
       summary: "Edit a comment"
       parameters:
-      - name: "commentId"
-        in: "path"
-        description: "Comment to be edited"
-        required: true
-        type: "integer"
-      - in: "body"
-        name: "text"
-        description: "Edited text"
-        required: true
-        schema:
-          type: "string"
+        - name: "commentId"
+          in: "path"
+          description: "Comment to be edited"
+          required: true
+          type: "integer"
+        - in: "body"
+          name: "text"
+          description: "Edited text"
+          required: true
+          schema:
+            type: "string"
       responses:
         204:
           description: "Comment successfully edited"
@@ -422,13 +420,13 @@ paths:
           description: "Internal Server Error"
     delete:
       tags:
-      - "comments"
+        - "comments"
       parameters:
-      - name: "commentId"
-        in: "path"
-        description: "Comment to be deleted"
-        required: true
-        type: "integer"
+        - name: "commentId"
+          in: "path"
+          description: "Comment to be deleted"
+          required: true
+          type: "integer"
       summary: "Delete a comment"
       responses:
         204:
@@ -439,77 +437,29 @@ paths:
             type: "string"
         500:
           description: "Internal Server Error"
-      
-  # ============== CATEGORIES ==============
-  /categories:
-    get:
-      tags:
-      - "categories"
-      summary: "Get a list of categories"
-      parameters:
-      - name: "name"
-        in: "query"
-        description: "search query for name"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "Categories successfully fetched"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Category"
-        400:
-          description: "Bad Request, see error message"
-          schema:
-            type: "string"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
-    post:
-      tags:
-      - "categories"
-      summary: "Post a new category"
-      parameters:
-      - in: "body"
-        name: "Category"
-        description: "Category to be added"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        204:
-          description: "Category successfully posted"
-        400:
-          description: "Bad Request, see error message"
-          schema:
-            type: "string"
-        500:
-          description: "Internal Server Error"
-          
+
   # ============== VOTES ==============
   /votes:
     get:
       tags:
-      - "votes"
+        - "votes"
       summary: "Get a user's vote on a meme"
       parameters:
-      - name: "memeId"
-        in: "query"
-        description: "ID of the meme"
-        required: true
-        type: "integer"
-      - name: "username"
-        in: "query"
-        description: "name of the user"
-        required: true
-        type: "string"
+        - name: "memeId"
+          in: "path"
+          description: "ID of the meme"
+          required: true
+          type: "integer"
+        - name: "username"
+          in: "body"
+          description: "name of the user"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Vote successfully fetched"
           schema:
-            type: "integer"
+            $ref: "#/definitions/Vote"
         400:
           description: "Bad Request, see error message"
           schema:
@@ -521,20 +471,25 @@ paths:
   /votes/{memeId}:
     post:
       tags:
-      - "votes"
+        - "votes"
       summary: "Vote on a meme"
       parameters:
-      - name: "memeId"
-        in: "path"
-        description: "ID of the meme"
-        required: true
-        type: "integer"      
-      - in: "body"
-        name: "vote"
-        description: "Whether the vote is up or down. (1 for up, -1 for down)"
-        required: true
-        schema:
+        - name: "username"
+          in: "body"
+          description: "username of the signed in user"
+          required: true
+          type: "string"
+        - name: "memeId"
+          in: "body"
+          description: "ID of the meme"
+          required: true
           type: "integer"
+        - in: "body"
+          name: "vote"
+          description: "Whether the vote is up or down. (1 for up, -1 for down)"
+          required: true
+          schema:
+            type: "integer"
       responses:
         200:
           description: "Vote successfully posted"
@@ -545,15 +500,20 @@ paths:
         500:
           description: "Internal Server Error"
     delete:
-      tags: 
-      - "votes"
+      tags:
+        - "votes"
       summary: "Undo a vote on a meme"
       parameters:
-      - name: "memeId"
-        in: "path"
-        description: "ID of the meme"
-        required: true
-        type: "integer" 
+        - name: "memeId"
+          in: "path"
+          description: "ID of the meme"
+          required: true
+          type: "integer"
+        - name: "username"
+          in: "body"
+          description: "username of the signed in user"
+          required: true
+          type: "string"
       responses:
         204:
           description: "Vote successfully removed"
@@ -565,13 +525,20 @@ paths:
           description: "Not Found"
         500:
           description: "Internal Server Error"
-      
+
 definitions:
+  Error:
+    type: "object"
+    required:
+      - "error"
+    properties:
+      error:
+        type: "string"
   User:
     type: "object"
     required:
-    - "username"
-    - "password"
+      - "username"
+      - "password"
     properties:
       username:
         type: "string"
@@ -580,11 +547,11 @@ definitions:
   NewMeme:
     type: "object"
     required:
-    - "templateId"
-    - "username"
-    - "imageSource"
-    - "isTwitterFormat"
-    - "isDeepFried"
+      - "templateId"
+      - "username"
+      - "imageSource"
+      - "isTwitterFormat"
+      - "isDeepFried"
     properties:
       templateId:
         type: "integer"
@@ -607,11 +574,11 @@ definitions:
   Meme:
     type: "object"
     required:
-    - "id"
-    - "templateId"
-    - "username"
-    - "imageSource"
-    - "votes"
+      - "id"
+      - "templateId"
+      - "username"
+      - "imageSource"
+      - "votes"
     properties:
       id:
         type: "integer"
@@ -632,9 +599,9 @@ definitions:
   NewMemeTemplate:
     type: "object"
     required:
-    - "username"
-    - "name"
-    - "imageSource"
+      - "username"
+      - "name"
+      - "imageSource"
     properties:
       username:
         type: "string"
@@ -645,10 +612,10 @@ definitions:
   MemeTemplate:
     type: "object"
     required:
-    - "id"
-    - "username"
-    - "name"
-    - "imageSource"
+      - "id"
+      - "username"
+      - "name"
+      - "imageSource"
     properties:
       id:
         type: "integer"
@@ -661,8 +628,8 @@ definitions:
   NewComment:
     type: "object"
     required:
-    - "memeId"
-    - "text"
+      - "memeId"
+      - "text"
     properties:
       memeId:
         type: "integer"
@@ -673,10 +640,10 @@ definitions:
   Comment:
     type: "object"
     required:
-    - "id"
-    - "memeId"
-    - "username"
-    - "text"
+      - "id"
+      - "memeId"
+      - "username"
+      - "text"
     properties:
       id:
         type: "integer"
@@ -692,13 +659,16 @@ definitions:
         type: "integer"
       lastEdited:
         type: "integer"
-  Category:
+  Vote:
     type: "object"
     required:
-    - "id"
-    - "name"
+      - "memeId"
+      - "username"
+      - "vote"
     properties:
-      id:
+      memeId:
         type: "integer"
-      name:
+      username:
         type: "string"
+      vote:
+        type: "interger"
