@@ -13,6 +13,7 @@ router.post("/", async (request, response) => {
 
 		const imageSource =
 			"https://i.kym-cdn.com/entries/icons/mobile/000/026/913/excuse.jpg"; // TODO: temp
+
 		const memeTemplate = new MemeTemplate(
 			request.body.username,
 			imageSource,
