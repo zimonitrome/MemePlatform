@@ -1,8 +1,6 @@
 import { createConnection } from "typeorm";
-import dotenv from "dotenv";
 import * as entities from "./entities";
 import { rebuildDB } from "../main";
-dotenv.config();
 
 export default async () => {
 	await createConnection({

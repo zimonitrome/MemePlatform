@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import memesRouter from "./routes/memes";
 import usersRouter from "./routes/users";

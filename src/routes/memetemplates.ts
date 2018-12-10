@@ -28,31 +28,15 @@ router.post("/", multerObj, async (request, response) => {
 			);
 		}
 
-		// await uploadImage(
-		// 	request.file.buffer,
-		// 	v4(),
-		// 	request.file.mimetype,
-		// 	(err, data) => {
-		// 		err ? console.log(err) : console.log(data);
-		// 	}
-		// );
-
-		await uploadImage(
+		const imageInfo = await uploadImage(
 			request.file.buffer,
-			v4(),
-			request.file.mimetype,
-			(error, data) => {
-				if (error) {
-					throw error;
-				} else {
-					console.log(data);
-				}
-			}
+			`templates/${v4()}`,
+			request.file.mimetype
 		);
 
 		const memeTemplate = new MemeTemplate(
 			request.body.username,
-			`ikke`,
+			imageInfo.Location,
 			request.body.name
 		);
 		memeTemplate.validate();
