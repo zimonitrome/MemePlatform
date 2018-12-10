@@ -10,13 +10,15 @@ import connectToDB from "./repository/dbConnection";
 import insertMockData from "./repository/insertMockData";
 import bodyParser, { urlencoded } from "body-parser";
 
+export const rebuildDB = false;
+
 const port = process.env.PORT || 80;
 const app = express();
 
 (async () => {
 	await connectToDB();
-	await getConnection().synchronize(true); // does the thing
-	await insertMockData();
+	await getConnection().synchronize(rebuildDB); // does the thing
+	if (rebuildDB) await insertMockData();
 
 	app.use(bodyParser.json());
 	app.use(bodyParser.text()); // for where entire body is parsed as single value // TODO: probably remove

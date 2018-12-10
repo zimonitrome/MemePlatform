@@ -4,18 +4,55 @@ import { MemeTemplate, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
 import { authenticate } from "../helpers/authenticationHelpers";
+import multer from "multer";
+import { uploadImage } from "../helpers/storageHelper";
+import { v4 } from "uuid";
 
 const router = express.Router();
 
-router.post("/", async (request, response) => {
+const multerObj = multer().single("image");
+
+Error.stackTraceLimit = Infinity;
+
+router.post("/", multerObj, async (request, response) => {
 	try {
 		authenticate(request.headers.authorization, request.body.username);
 
-		const imageSource =
-			"https://i.kym-cdn.com/entries/icons/mobile/000/026/913/excuse.jpg"; // TODO: temp
+		if (!request.file) {
+			throw new ValidationError("No file supplied.");
+		}
+
+		if (!request.file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+			throw new ValidationError(
+				"Unsupported image format. Should be png, jpg or gif."
+			);
+		}
+
+		// await uploadImage(
+		// 	request.file.buffer,
+		// 	v4(),
+		// 	request.file.mimetype,
+		// 	(err, data) => {
+		// 		err ? console.log(err) : console.log(data);
+		// 	}
+		// );
+
+		await uploadImage(
+			request.file.buffer,
+			v4(),
+			request.file.mimetype,
+			(error, data) => {
+				if (error) {
+					throw error;
+				} else {
+					console.log(data);
+				}
+			}
+		);
+
 		const memeTemplate = new MemeTemplate(
 			request.body.username,
-			imageSource,
+			`ikke`,
 			request.body.name
 		);
 		memeTemplate.validate();

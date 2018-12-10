@@ -1,6 +1,7 @@
 import { createConnection } from "typeorm";
 import dotenv from "dotenv";
 import * as entities from "./entities";
+import { rebuildDB } from "../main";
 dotenv.config();
 
 export default async () => {
@@ -11,7 +12,7 @@ export default async () => {
 		username: process.env.DB_USERNAME,
 		password: process.env.DB_PASSWORD,
 		database: "schpoopDB",
-		synchronize: true,
+		synchronize: rebuildDB,
 		logging: false,
 		entities: [
 			entities.Comment,
