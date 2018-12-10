@@ -8,8 +8,6 @@ import { authenticate } from "../helpers/authenticationHelpers";
 const router = express.Router();
 
 router.post("/", async (request, response) => {
-	// TODO: validate parameters
-
 	try {
 		authenticate(request.headers.authorization, request.body.username);
 
@@ -46,8 +44,6 @@ router.get("/:memeId", async (request, response) => {
 		// TODO: which one to check
 		if (error instanceof ValidationError) {
 			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
-			response.status(404).end();
 		} else {
 			response.status(500).end();
 		}

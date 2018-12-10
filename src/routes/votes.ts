@@ -7,12 +7,12 @@ import { authenticate } from "../helpers/authenticationHelpers";
 
 const router = express.Router();
 
-router.post("/", async (request, response) => {
+router.post("/:memeId", async (request, response) => {
 	try {
 		authenticate(request.headers.authorization, request.body.username);
 		const vote = new Vote(
 			request.body.vote,
-			request.body.memeId,
+			request.params.memeId,
 			request.body.username
 		);
 		vote.validate();

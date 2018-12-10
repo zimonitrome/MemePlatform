@@ -8,14 +8,14 @@ host: "TBA"
 tags:
   - name: "users"
     description: "Registered users"
+  - name: "sessions"
+    description: "Sessions for logged in users"
   - name: "memes"
     description: "Created meme posts"
-  - name: "templates"
-    description: "Template images"
+  - name: "memetemplates"
+    description: "Meme image templates"
   - name: "comments"
     description: "Comments on meme posts"
-  - name: "categories"
-    description: "Categories of memes"
 
 paths:
   # ============== USERS ==============
@@ -61,12 +61,6 @@ paths:
             type: "array"
             items:
               type: "string"
-        400:
-          description: "Bad Request, see error message"
-          schema:
-            type: "string"
-        404:
-          description: "Not Found"
         500:
           description: "Internal Server Error"
   /users/{username}:
@@ -75,6 +69,11 @@ paths:
         - "users"
       summary: "Edits a user"
       parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
         - name: "username"
           in: "path"
           description: "username of the user to edit"
@@ -85,14 +84,17 @@ paths:
           description: "new password to update"
           required: true
           schema:
-            type: "string"
+            type: "object"
+            properties:
+              password:
+                type: "string"
       responses:
         204:
           description: "User successfully edited"
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
         500:
@@ -102,6 +104,11 @@ paths:
         - "users"
       summary: "Removes a user"
       parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
         - name: "username"
           in: "path"
           description: "username of the user to delete"
@@ -113,16 +120,18 @@ paths:
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
         500:
           description: "Internal Server Error"
-  /users/login-sessions:
+
+  # ============== SESSIONS ==============
+  /sessions:
     post:
       tags:
-        - "users"
-      summary: "Creates a new login session"
+        - "sessions"
+      summary: "Logs in a user"
       consumes:
         - "application/json"
       parameters:
@@ -131,17 +140,21 @@ paths:
           description: "User to be logged in"
           required: true
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/UserLogin"
       responses:
-        204:
+        200:
           description: "User successfully logged in"
+          schema:
+            type: "object"
+            properties:
+              accessToken:
+                type: "string"
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
-
   # ============== MEMES ==============
   /memes:
     post:
@@ -149,6 +162,11 @@ paths:
         - "memes"
       summary: "Post a new meme"
       parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
         - in: "body"
           name: "body"
           description: "Meme to be posted"
@@ -156,12 +174,14 @@ paths:
           schema:
             $ref: "#/definitions/NewMeme"
       responses:
-        204:
+        200:
           description: "Meme successfully posted"
+          schema:
+            $ref: "#/definitions/Meme"
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
     get:
@@ -184,11 +204,6 @@ paths:
           description: "name of user to get memes by"
           required: false
           type: "string"
-        - name: "categoryId"
-          in: "query"
-          description: "ID of category to get memes by"
-          required: false
-          type: "string"
       responses:
         200:
           description: "Memes successfully fetched"
@@ -196,12 +211,6 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Meme"
-        400:
-          description: "Bad Request, see error message"
-          schema:
-            type: "string"
-        404:
-          description: "Not Found"
         500:
           description: "Internal Server Error"
   /memes/{memeId}:
@@ -220,10 +229,6 @@ paths:
           description: "Meme successfully fetched"
           schema:
             $ref: "#/definitions/Meme"
-        400:
-          description: "Bad Request, see error message"
-          schema:
-            type: "string"
         404:
           description: "Not Found"
         500:
@@ -233,6 +238,11 @@ paths:
         - "memes"
       summary: "Delete a meme"
       parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
         - name: "memeId"
           in: "path"
           description: "id of the meme to delete"
@@ -244,17 +254,24 @@ paths:
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
+        404:
+          description: "Not Found"
         500:
           description: "Internal Server Error"
 
   # ============== TEMPLATES ==============
-  /templates:
+  /memetemplates:
     post:
       tags:
-        - "templates"
+        - "memetemplates"
       summary: "Create a new meme template"
       parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
         - in: "body"
           name: "body"
           description: "Template to be created"
@@ -262,17 +279,19 @@ paths:
           schema:
             $ref: "#/definitions/NewMemeTemplate"
       responses:
-        204:
+        200:
           description: "Template successfully posted"
+          schema:
+            $ref: "#/definitions/MemeTemplate"
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
     get:
       tags:
-        - "templates"
+        - "memetemplates"
       summary: "Get a list of meme templates"
       parameters:
         - name: "username"
@@ -292,18 +311,12 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/MemeTemplate"
-        400:
-          description: "Bad Request, see error message"
-          schema:
-            type: "string"
-        404:
-          description: "Not Found"
         500:
           description: "Internal Server Error"
-  /templates/{templateId}:
+  /memetemplates/{templateId}:
     get:
       tags:
-        - "templates"
+        - "memetemplates"
       summary: "Get a template"
       parameters:
         - name: "templateId"
@@ -316,19 +329,20 @@ paths:
           description: "Template successfully fetched"
           schema:
             $ref: "#/definitions/MemeTemplate"
-        400:
-          description: "Bad Request, see error message"
-          schema:
-            type: "string"
         404:
           description: "Not Found"
         500:
           description: "Internal Server Error"
     delete:
       tags:
-        - "templates"
+        - "memetemplates"
       summary: "Delete a template"
       parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
         - name: "templateId"
           in: "path"
           description: "id of the template to delete"
@@ -340,11 +354,42 @@ paths:
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
+        404:
+          description: "Not Found"
         500:
           description: "Internal Server Error"
 
   # ============== COMMENTS ==============
+
+  /comments:
+    post:
+      tags:
+        - "comments"
+      summary: "Comment on a meme"
+      parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Comment to be added"
+          required: true
+          schema:
+            $ref: "#/definitions/NewComment"
+      responses:
+        200:
+          description: "Comment successfully posted"
+          schema:
+            $ref: "#/definitions/Comment"
+        400:
+          description: "Bad Request, see error message"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Internal Server Error"
   /comments/{memeId}:
     get:
       tags:
@@ -353,7 +398,7 @@ paths:
       parameters:
         - name: "memeId"
           in: "path"
-          description: "Id of meme to get comments of"
+          description: "Id of meme to get comments on"
           required: true
           type: "string"
       responses:
@@ -366,30 +411,7 @@ paths:
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
-        404:
-          description: "Not Found"
-        500:
-          description: "Internal Server Error"
-  /comments:
-    post:
-      tags:
-        - "comments"
-      summary: "Comment on a meme"
-      parameters:
-        - in: "body"
-          name: "body"
-          description: "Comment to be added"
-          required: true
-          schema:
-            $ref: "#/definitions/NewComment"
-      responses:
-        204:
-          description: "Comment successfully posted"
-        400:
-          description: "Bad Request, see error message"
-          schema:
-            type: "string"
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
   /comments/{commentId}:
@@ -398,30 +420,47 @@ paths:
         - "comments"
       summary: "Edit a comment"
       parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
         - name: "commentId"
           in: "path"
           description: "Comment to be edited"
           required: true
           type: "integer"
         - in: "body"
-          name: "text"
+          name: "body"
           description: "Edited text"
           required: true
           schema:
-            type: "string"
+            type: "object"
+            properties:
+              text:
+                type: "string"
       responses:
-        204:
+        200:
           description: "Comment successfully edited"
+          schema:
+            $ref: "#/definitions/Comment"
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
+        404:
+          description: "Not Found"
         500:
           description: "Internal Server Error"
     delete:
       tags:
         - "comments"
       parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
         - name: "commentId"
           in: "path"
           description: "Comment to be deleted"
@@ -434,12 +473,46 @@ paths:
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
+        404:
+          description: "Not Found"
         500:
           description: "Internal Server Error"
 
   # ============== VOTES ==============
-  /votes:
+  /votes/{memeId}:
+    post:
+      tags:
+        - "votes"
+      summary: "Vote on a meme"
+      parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
+        - name: "memeId"
+          in: "path"
+          description: "ID of the meme"
+          required: true
+          type: "string"
+        - name: "body"
+          in: "body"
+          description: "username of the signed in user and vote to add"
+          required: true
+          schema:
+            $ref: "#/definitions/NewVote"
+      responses:
+        200:
+          description: "Vote successfully posted"
+          schema:
+            $ref: "#/definitions/Vote"
+        400:
+          description: "Bad Request, see error message"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Internal Server Error"
     get:
       tags:
         - "votes"
@@ -450,11 +523,15 @@ paths:
           description: "ID of the meme"
           required: true
           type: "integer"
-        - name: "username"
+        - name: "body"
           in: "body"
           description: "name of the user"
           required: true
-          type: "string"
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
       responses:
         200:
           description: "Vote successfully fetched"
@@ -463,40 +540,9 @@ paths:
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
-        500:
-          description: "Internal Server Error"
-  /votes/{memeId}:
-    post:
-      tags:
-        - "votes"
-      summary: "Vote on a meme"
-      parameters:
-        - name: "username"
-          in: "body"
-          description: "username of the signed in user"
-          required: true
-          type: "string"
-        - name: "memeId"
-          in: "body"
-          description: "ID of the meme"
-          required: true
-          type: "integer"
-        - in: "body"
-          name: "vote"
-          description: "Whether the vote is up or down. (1 for up, -1 for down)"
-          required: true
-          schema:
-            type: "integer"
-      responses:
-        200:
-          description: "Vote successfully posted"
-        400:
-          description: "Bad Request, see error message"
-          schema:
-            type: "string"
         500:
           description: "Internal Server Error"
     delete:
@@ -504,23 +550,32 @@ paths:
         - "votes"
       summary: "Undo a vote on a meme"
       parameters:
+        - in: "header"
+          name: "Authorization"
+          description: "JWT Bearer Access Token"
+          required: true
+          type: "string"
         - name: "memeId"
           in: "path"
           description: "ID of the meme"
           required: true
           type: "integer"
-        - name: "username"
+        - name: "body"
           in: "body"
-          description: "username of the signed in user"
+          description: "name of the user"
           required: true
-          type: "string"
+          schema:
+            type: "object"
+            properties:
+              username:
+                type: "string"
       responses:
         204:
           description: "Vote successfully removed"
         400:
           description: "Bad Request, see error message"
           schema:
-            type: "string"
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
         500:
@@ -557,8 +612,6 @@ definitions:
         type: "integer"
       username:
         type: "string"
-      categoryId:
-        type: "integer"
       name:
         type: "string"
       imageSource:
@@ -586,8 +639,6 @@ definitions:
         type: "integer"
       username:
         type: "string"
-      categoryId:
-        type: "integer"
       name:
         type: "string"
       imageSource:
@@ -600,7 +651,6 @@ definitions:
     type: "object"
     required:
       - "username"
-      - "name"
       - "imageSource"
     properties:
       username:
@@ -614,7 +664,6 @@ definitions:
     required:
       - "id"
       - "username"
-      - "name"
       - "imageSource"
     properties:
       id:
@@ -630,12 +679,15 @@ definitions:
     required:
       - "memeId"
       - "text"
+      - "username"
     properties:
       memeId:
         type: "integer"
       parentCommentId:
         type: "string"
       text:
+        type: "string"
+      username:
         type: "string"
   Comment:
     type: "object"
@@ -671,4 +723,27 @@ definitions:
       username:
         type: "string"
       vote:
-        type: "interger"
+        type: "integer"
+  NewVote:
+    type: "object"
+    required:
+      - "username"
+      - "vote"
+    properties:
+      username:
+        type: "string"
+      vote:
+        type: "integer"
+  UserLogin:
+    type: "object"
+    required:
+      - "grant_type"
+      - "username"
+      - "password"
+    properties:
+      grant_type:
+        type: "string"
+      username:
+        type: "string"
+      password:
+        type: "string"

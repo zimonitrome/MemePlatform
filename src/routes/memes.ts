@@ -58,9 +58,7 @@ router.get("/:memeId", async (request, response) => {
 		response.status(200).json(meme);
 	} catch (error) {
 		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
+		if (error.name === "EntityNotFound") {
 			response.status(404).end();
 		} else {
 			response.status(500).end();
