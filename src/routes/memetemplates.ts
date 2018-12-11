@@ -7,6 +7,7 @@ import { authenticate } from "../helpers/authenticationHelpers";
 import multer from "multer";
 import { uploadImage } from "../helpers/storageHelper";
 import { v4 } from "uuid";
+import { resizeImage } from "../helpers/memeGenerator";
 
 const router = express.Router();
 
@@ -29,7 +30,7 @@ router.post("/", multerObj, async (request, response) => {
 		}
 
 		const imageInfo = await uploadImage(
-			request.file.buffer,
+			await resizeImage(request.file.buffer, 900),
 			`templates/${v4()}`,
 			request.file.mimetype
 		);

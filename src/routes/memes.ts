@@ -4,6 +4,7 @@ import { Meme, Vote, Comment } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
 import { authenticate } from "../helpers/authenticationHelpers";
+import { createMeme } from "../helpers/memeGenerator";
 
 const router = express.Router();
 
@@ -13,8 +14,12 @@ router.post("/", async (request, response) => {
 	try {
 		authenticate(request.headers.authorization, request.body.username);
 
-		// TODO: Generate meme image here
-		const imageSource = "https://i.redd.it/po71lilrehky.jpg"; // temp
+		const imageSource = await createMeme(
+			request.body.templateId,
+			request.body.topText,
+			request.body.bottomText
+		);
+
 		const meme = new Meme(
 			request.body.templateId,
 			request.body.username,
