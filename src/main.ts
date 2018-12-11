@@ -23,7 +23,6 @@ const app = express();
 	if (rebuildDB) await insertMockData();
 
 	app.use(bodyParser.json());
-	app.use(bodyParser.text()); // for where entire body is parsed as single value // TODO: probably remove
 	app.use(bodyParser.urlencoded({ extended: false }));
 	app.use("/memes", memesRouter);
 	app.use("/users", usersRouter);

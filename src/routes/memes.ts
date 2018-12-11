@@ -13,7 +13,6 @@ router.post("/", async (request, response) => {
 
 	try {
 		authenticate(request.headers.authorization, request.body.username);
-
 		const imageSource = await createMeme(
 			request.body.templateId,
 			request.body.topText,
@@ -27,11 +26,13 @@ router.post("/", async (request, response) => {
 			request.body.name
 		);
 		meme.validate();
+
 		const memeRepo = getRepository(Meme);
 		const savedMeme = await memeRepo.save(meme);
 		response.status(200).json(savedMeme);
 	} catch (error) {
 		console.error(error); // debugging
+
 		if (error instanceof ValidationError) {
 			response.status(400).json(error.jsonError);
 		} else {

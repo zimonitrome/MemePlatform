@@ -76,7 +76,7 @@ const generateMemeImage = async (
 		// tslint:disable-next-line:no-any
 		const image: any = await loadImageAsync(imageBuffer);
 
-		const imageSize = { width: image.width, height: image.width };
+		const imageSize = { width: image.width, height: image.height };
 
 		const canvas = Canvas.createCanvas(imageSize.width, imageSize.height);
 		const ctx = canvas.getContext("2d");
