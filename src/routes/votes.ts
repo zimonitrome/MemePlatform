@@ -3,33 +3,58 @@ import { getRepository, Repository, Like } from "typeorm";
 import { Vote, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
-import { authenticate } from "../helpers/authenticationHelpers";
+import { authorize } from "../helpers/authorizationHelpers";
+import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from "constants";
 
 const router = express.Router();
 
-router.post("/:memeId", async (request, response) => {
+router.put("/:memeId", async (request, response) => {
 	try {
-		authenticate(request.headers.authorization, request.body.username);
+		authorize(request.headers.authorization, request.body.username);
 		const vote = new Vote(
 			request.body.vote,
 			request.params.memeId,
 			request.body.username
 		);
-		vote.validate();
+		await vote.validate();
 
 		const voteRepo = getRepository(Vote);
-		await voteRepo.save(vote);
+		const existingVote = await voteRepo.findOne({
+			memeId: request.params.memeId,
+			username: request.body.username
+		});
 
-		// Also updates votecount on meme
 		const memeRepo = getRepository(Meme);
+		// Forced to split vote save due to typeorm/PostgreSQL bug
+		if (existingVote) {
+			await voteRepo.update(
+				{ memeId: vote.memeId, username: vote.username },
+				vote
+			);
+			if (existingVote.vote === vote.vote) {
+				throw new ValidationError("Vote like this already exists.");
+			}
 
-		switch (vote.vote) {
-			case 1:
-				await memeRepo.increment({ id: vote.memeId }, "votes", 1);
-				break;
-			case -1:
-				await memeRepo.decrement({ id: vote.memeId }, "votes", 1);
-				break;
+			// Also updates votecount on meme
+			switch (vote.vote) {
+				case 1:
+					await memeRepo.increment({ id: vote.memeId }, "votes", 2);
+					break;
+				case -1:
+					await memeRepo.decrement({ id: vote.memeId }, "votes", 2);
+					break;
+			}
+		} else {
+			await voteRepo.save(vote);
+			// Also updates votecount on meme
+			switch (vote.vote) {
+				case 1:
+					await memeRepo.increment({ id: vote.memeId }, "votes", 1);
+					break;
+				case -1:
+					await memeRepo.decrement({ id: vote.memeId }, "votes", 1);
+					break;
+			}
 		}
 		response.status(200).json(vote);
 	} catch (error) {
@@ -50,7 +75,7 @@ router.get("/:memeId", async (request, response) => {
 		const voteRepo = getRepository(Vote);
 
 		const vote = await voteRepo.findOneOrFail({
-			memeId: request.body.memeId,
+			memeId: request.params.memeId,
 			username: request.body.username
 		});
 		response.status(200).json(vote);
@@ -70,7 +95,7 @@ router.delete("/:memeId", async (request, response) => {
 	try {
 		const voteRepo = getRepository(Vote);
 
-		authenticate(request.headers.authorization, request.body.username);
+		authorize(request.headers.authorization, request.body.username);
 
 		const vote = await voteRepo.findOneOrFail({
 			where: { memeId: request.params.memeId, username: request.body.username }

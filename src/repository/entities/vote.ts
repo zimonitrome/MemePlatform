@@ -10,10 +10,10 @@ export class Vote {
 		this.username = username;
 	}
 
-	validate() {
-		Vote.validateVoteSign(this.vote);
-		Vote.validateMemeId(this.memeId);
-		Vote.validateUsername(this.username);
+	async validate() {
+		await Vote.validateVoteSign(this.vote);
+		await Vote.validateMemeId(this.memeId);
+		await Vote.validateUsername(this.username);
 	}
 
 	static validateVoteSign(vote: number) {
@@ -24,10 +24,10 @@ export class Vote {
 		}
 	}
 
-	static validateMemeId(memeId: number) {
+	static async validateMemeId(memeId: number) {
 		if (memeId) {
 			const memeRepo = getRepository(Meme);
-			if (memeRepo.find({ where: { id: memeId } })) {
+			if (await memeRepo.findOne({ id: memeId })) {
 				return;
 			} else {
 				throw new ValidationError("Meme does not exist.");
@@ -37,10 +37,10 @@ export class Vote {
 		}
 	}
 
-	static validateUsername(username: string) {
+	static async validateUsername(username: string) {
 		if (username) {
 			const userRepo = getRepository(User);
-			if (userRepo.find({ where: { username } })) {
+			if (await userRepo.findOne({ where: { username } })) {
 				return true;
 			} else {
 				throw new ValidationError("User does not exist.");

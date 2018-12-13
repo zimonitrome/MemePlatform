@@ -20,7 +20,7 @@ const app = express();
 (async () => {
 	await connectToDB();
 	await getConnection().synchronize(rebuildDB); // does the thing
-	if (rebuildDB) await insertMockData();
+	// if (rebuildDB) await insertMockData();
 
 	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded({ extended: false }));

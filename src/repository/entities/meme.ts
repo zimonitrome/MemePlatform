@@ -23,16 +23,16 @@ export class Meme {
 		this.votes = 0;
 	}
 
-	validate() {
-		Meme.validateName(this.name);
-		Meme.validateTemplateId(this.templateId);
-		Meme.validateUsername(this.username);
+	async validate() {
+		await Meme.validateName(this.name);
+		await Meme.validateTemplateId(this.templateId);
+		await Meme.validateUsername(this.username);
 	}
 
-	static validateTemplateId(templateId: number) {
+	static async validateTemplateId(templateId: number) {
 		if (templateId) {
 			const templateRepo = getRepository(MemeTemplate);
-			if (templateRepo.find({ where: { id: templateId } })) {
+			if (await templateRepo.findOne({ id: templateId })) {
 				return;
 			} else {
 				throw new ValidationError("Template does not exist.");
@@ -42,10 +42,10 @@ export class Meme {
 		}
 	}
 
-	static validateUsername(username: string) {
+	static async validateUsername(username: string) {
 		if (username) {
 			const userRepo = getRepository(User);
-			if (userRepo.find({ where: { username } })) {
+			if (await userRepo.findOne({ username })) {
 				return;
 			} else {
 				throw new ValidationError("User does not exist.");

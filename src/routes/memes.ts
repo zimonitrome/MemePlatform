@@ -3,7 +3,7 @@ import { getRepository, Repository, Like } from "typeorm";
 import { Meme, Vote, Comment } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
-import { authenticate } from "../helpers/authenticationHelpers";
+import { authorize } from "../helpers/authorizationHelpers";
 import { createMeme } from "../helpers/memeGenerator";
 import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
 import { defaultTakeAmount } from "../helpers/constants";
@@ -14,7 +14,7 @@ router.post("/", async (request, response) => {
 	// TODO: validate parameters
 
 	try {
-		authenticate(request.headers.authorization, request.body.username);
+		authorize(request.headers.authorization, request.body.username);
 		const imageSource = await createMeme(
 			request.body.templateId,
 			request.body.topText,
@@ -27,7 +27,7 @@ router.post("/", async (request, response) => {
 			imageSource,
 			request.body.name
 		);
-		meme.validate();
+		await meme.validate();
 
 		const memeRepo = getRepository(Meme);
 		const savedMeme = await memeRepo.save(meme);
@@ -84,7 +84,7 @@ router.delete("/:memeId", async (request, response) => {
 		const memeRepo = getRepository(Meme);
 
 		const meme = await memeRepo.findOneOrFail({ id: request.params.memeId });
-		authenticate(request.headers.authorization, meme.username);
+		authorize(request.headers.authorization, meme.username);
 
 		deleteImage(pathFromUrl(meme.imageSource));
 

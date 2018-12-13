@@ -7,7 +7,7 @@ interface AccessToken {
 	exp: number;
 }
 
-export const authenticateHeader = (
+export const verifyHeader = (
 	header: string | undefined
 ): AccessToken | undefined => {
 	try {
@@ -22,8 +22,8 @@ export const authenticateHeader = (
 	}
 };
 
-export const authenticate = (header: string | undefined, username: string) => {
-	const accessToken = authenticateHeader(header);
+export const authorize = (header: string | undefined, username: string) => {
+	const accessToken = verifyHeader(header);
 	if (!accessToken) {
 		throw new ValidationError("Invalid token.");
 	}

@@ -10,7 +10,7 @@ import {
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
 import { hash } from "bcrypt";
-import { authenticate } from "../helpers/authenticationHelpers";
+import { authorize } from "../helpers/authorizationHelpers";
 import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
 import { defaultTakeAmount } from "../helpers/constants";
 
@@ -45,8 +45,8 @@ router.post("/", async (request, response) => {
 router.get("/", async (request, response) => {
 	try {
 		const userRepo = getRepository(User);
-		const queries = ["name"];
-		const isSearch = ["name"];
+		const queries = ["username"];
+		const isSearch = ["username"];
 		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
 		const pageSize = request.query.pageSize || defaultTakeAmount;
 		const users = await userRepo.find({
@@ -54,21 +54,16 @@ router.get("/", async (request, response) => {
 			take: pageSize,
 			skip: request.query.page * pageSize || 0
 		});
-		const userNames: Array<string> = [];
-		users.forEach(user => {
-			userNames.push(user.username);
-		});
-		response.status(200).json(userNames);
+		response.status(200).json(users.map(user => user.username));
 	} catch (error) {
 		console.error(error); // debugging
 		response.status(500).end();
 	}
 });
 
-router.put("/:username", async (request, response) => {
+router.patch("/:username", async (request, response) => {
 	try {
-		// TODO: Maybe update docs idk?
-		authenticate(request.headers.authorization, request.params.username);
+		authorize(request.headers.authorization, request.params.username);
 
 		User.validatePassword(request.body.password);
 		const updatedUser = new User(
@@ -95,7 +90,7 @@ router.put("/:username", async (request, response) => {
 
 router.delete("/:username", async (request, response) => {
 	try {
-		authenticate(request.headers.authorization, request.params.username);
+		authorize(request.headers.authorization, request.params.username);
 
 		const userRepo = getRepository(User);
 		const voteRepo = getRepository(Vote);

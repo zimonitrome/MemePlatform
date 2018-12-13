@@ -3,7 +3,7 @@ import { getRepository, Repository, Like, IsNull } from "typeorm";
 import { MemeTemplate, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
-import { authenticate } from "../helpers/authenticationHelpers";
+import { authorize } from "../helpers/authorizationHelpers";
 import multer from "multer";
 import {
 	uploadImage,
@@ -22,7 +22,7 @@ Error.stackTraceLimit = Infinity;
 
 router.post("/", multerObj, async (request, response) => {
 	try {
-		authenticate(request.headers.authorization, request.body.username);
+		authorize(request.headers.authorization, request.body.username);
 
 		if (!request.file) {
 			throw new ValidationError("No file supplied.");
@@ -45,7 +45,7 @@ router.post("/", multerObj, async (request, response) => {
 			imageInfo.Location,
 			request.body.name
 		);
-		memeTemplate.validate();
+		await memeTemplate.validate();
 		const memeTemplateRepo = getRepository(MemeTemplate);
 		const savedTemplate = await memeTemplateRepo.save(memeTemplate);
 		response.status(200).json(savedTemplate);
@@ -101,7 +101,7 @@ router.delete("/:templateId", async (request, response) => {
 		const memeTemplate = await memeTemplateRepo.findOneOrFail({
 			id: request.params.templateId
 		});
-		authenticate(request.headers.authorization, memeTemplate.username);
+		authorize(request.headers.authorization, memeTemplate.username);
 
 		const a = await deleteImage(pathFromUrl(memeTemplate.imageSource)).catch(
 			_e => {
