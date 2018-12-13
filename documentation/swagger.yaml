@@ -431,6 +431,16 @@ paths:
           description: "ID of meme to get comments on"
           required: true
           type: "string"
+        - name: "pageSize"
+          in: "query"
+          description: "How many comments to fetch"
+          required: false
+          type: "integer"
+        - name: "page"
+          in: "query"
+          description: "Which page to fetch"
+          required: false
+          type: "integer"
       responses:
         200:
           description: "Comments successfully fetched"

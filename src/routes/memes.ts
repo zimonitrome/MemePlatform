@@ -46,7 +46,7 @@ router.post("/", async (request, response) => {
 router.get("/", async (request, response) => {
 	try {
 		const memeRepo = getRepository(Meme);
-		const queries = ["name", "templateId", "username", "categoryId"];
+		const queries = ["name", "templateId", "username"];
 		const isSearch = ["name"];
 		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
 		const pageSize = request.query.pageSize || defaultTakeAmount;

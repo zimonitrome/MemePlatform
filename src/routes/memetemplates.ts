@@ -71,7 +71,6 @@ router.get("/", async (request, response) => {
 			take: pageSize,
 			skip: request.query.page * pageSize || 0
 		});
-
 		response.status(200).json(memeTemplates);
 	} catch (error) {
 		console.error(error); // debugging

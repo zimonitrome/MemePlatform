@@ -4,6 +4,7 @@ import { Comment } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
 import { authenticate } from "../helpers/authenticationHelpers";
+import { defaultTakeAmount } from "../helpers/constants";
 
 const router = express.Router();
 
@@ -35,8 +36,11 @@ router.post("/", async (request, response) => {
 router.get("/:memeId", async (request, response) => {
 	try {
 		const commentRepo = getRepository(Comment);
+		const pageSize = request.query.pageSize || defaultTakeAmount;
 		const comments = await commentRepo.find({
-			where: { memeId: request.params.memeId }
+			where: { memeId: request.params.memeId },
+			take: pageSize,
+			skip: request.query.page * pageSize || 0
 		});
 		response.status(200).json(comments);
 	} catch (error) {
