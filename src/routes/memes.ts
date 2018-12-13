@@ -5,6 +5,7 @@ import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
 import { authenticate } from "../helpers/authenticationHelpers";
 import { createMeme } from "../helpers/memeGenerator";
+import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
 
 const router = express.Router();
 
@@ -78,6 +79,8 @@ router.delete("/:memeId", async (request, response) => {
 
 		const meme = await memeRepo.findOneOrFail({ id: request.params.memeId });
 		authenticate(request.headers.authorization, meme.username);
+
+		deleteImage(pathFromUrl(meme.imageSource));
 
 		await memeRepo.update(
 			{ id: request.params.memeId },

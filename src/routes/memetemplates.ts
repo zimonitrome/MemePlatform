@@ -5,7 +5,11 @@ import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
 import { authenticate } from "../helpers/authenticationHelpers";
 import multer from "multer";
-import { uploadImage } from "../helpers/storageHelper";
+import {
+	uploadImage,
+	deleteImage,
+	pathFromUrl
+} from "../helpers/storageHelper";
 import { v4 } from "uuid";
 import { resizeImage } from "../helpers/memeGenerator";
 
@@ -93,6 +97,12 @@ router.delete("/:templateId", async (request, response) => {
 		});
 		authenticate(request.headers.authorization, memeTemplate.username);
 
+		await deleteImage(pathFromUrl(memeTemplate.imageSource)).catch(_e => {
+			throw new Error();
+		});
+
+		await memeTemplateRepo.delete({ id: request.params.templateId });
+
 		// "Blanks" templateId in all memes made from template
 		const memeRepo = getRepository(Meme);
 		const memes = await memeRepo.find({
@@ -101,8 +111,6 @@ router.delete("/:templateId", async (request, response) => {
 		memes.forEach(async meme => {
 			memeRepo.update({ id: meme.id }, { templateId: undefined });
 		});
-
-		await memeTemplateRepo.delete({ id: request.params.templateId });
 
 		response.status(204).end();
 	} catch (error) {

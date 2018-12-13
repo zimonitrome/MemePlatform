@@ -11,6 +11,7 @@ import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
 import { hash } from "bcrypt";
 import { authenticate } from "../helpers/authenticationHelpers";
+import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
 
 const router = express.Router();
 const hashRounds = 6;
@@ -93,51 +94,70 @@ router.delete("/:username", async (request, response) => {
 
 		await userRepo.delete({ username: request.params.username });
 
-		// Delete all votes and updates vote count on voted memes
-		const votes = await voteRepo.find({ username: request.params.username });
-		await voteRepo.delete({ username: request.params.username });
-		votes.forEach(async vote => {
-			switch (vote.vote) {
-				case -1:
-					await memeRepo.increment({ id: vote.memeId }, "votes", 1);
-					break;
-				case 1:
-					await memeRepo.decrement({ id: vote.memeId }, "votes", 1);
-					break;
-			}
-		});
+		{
+			// Delete all votes and updates vote count on voted memes
+			const votes = await voteRepo.find({ username: request.params.username });
+			await voteRepo.delete({ username: request.params.username });
+			votes.forEach(async vote => {
+				switch (vote.vote) {
+					case -1:
+						await memeRepo.increment({ id: vote.memeId }, "votes", 1);
+						break;
+					case 1:
+						await memeRepo.decrement({ id: vote.memeId }, "votes", 1);
+						break;
+				}
+			});
+		}
 
-		// Delete all templates made by the user and "blanks" memes made from template
-		const templateRepo = getRepository(MemeTemplate);
-		const templateMemes = await memeRepo.find({
-			templateId: request.params.templateId
-		});
-		await templateRepo.delete({ username: request.params.username });
-		templateMemes.forEach(async meme => {
-			memeRepo.update({ id: meme.id }, { templateId: undefined });
-		});
+		{
+			const templateRepo = getRepository(MemeTemplate);
+			// Remove all template images crated by user
+			const templates = await templateRepo.find({
+				where: { username: request.params.username }
+			});
+			templates.forEach(template => {
+				deleteImage(pathFromUrl(template.imageSource));
+			});
+			// Blanks templateId on all the memes made by templates
+			const templateMemes = await memeRepo.find({
+				templateId: request.params.templateId
+			});
+			templateMemes.forEach(async meme => {
+				memeRepo.update({ id: meme.id }, { templateId: undefined });
+			});
+			// Deletes all templates
+			await templateRepo.delete({ username: request.params.username });
+		}
 
-		// "Blanks" memes made by the user
-		const userMemes = await memeRepo.find({
-			where: { username: request.params.username }
-		});
-		userMemes.forEach(async meme => {
-			memeRepo.update(
-				{ id: meme.id },
-				{ username: undefined, imageSource: undefined }
-			);
-		});
+		{
+			// "Blanks" memes made by the user
+			const userMemes = await memeRepo.find({
+				where: { username: request.params.username }
+			});
+			userMemes.forEach(meme => {
+				deleteImage(pathFromUrl(meme.imageSource));
+			});
+			userMemes.forEach(async meme => {
+				memeRepo.update(
+					{ id: meme.id },
+					{ username: undefined, imageSource: undefined }
+				);
+			});
+		}
 
-		// "Blanks" comments made by the user
-		const comments = await commentRepo.find({
-			where: { username: request.params.username }
-		});
-		comments.forEach(async comment => {
-			commentRepo.update(
-				{ id: comment.id },
-				{ username: undefined, text: undefined }
-			);
-		});
+		{
+			// "Blanks" comments made by the user
+			const comments = await commentRepo.find({
+				where: { username: request.params.username }
+			});
+			comments.forEach(async comment => {
+				commentRepo.update(
+					{ id: comment.id },
+					{ username: undefined, text: undefined }
+				);
+			});
+		}
 
 		response.status(204).end();
 	} catch (error) {
