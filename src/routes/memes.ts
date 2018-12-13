@@ -6,6 +6,7 @@ import { ValidationError } from "../helpers/ValidationError";
 import { authenticate } from "../helpers/authenticationHelpers";
 import { createMeme } from "../helpers/memeGenerator";
 import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
+import { defaultTakeAmount } from "../helpers/constants";
 
 const router = express.Router();
 
@@ -48,7 +49,12 @@ router.get("/", async (request, response) => {
 		const queries = ["name", "templateId", "username", "categoryId"];
 		const isSearch = ["name"];
 		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
-		const memes = await memeRepo.find({ where: whereQueries });
+		const pageSize = request.query.pageSize || defaultTakeAmount;
+		const memes = await memeRepo.find({
+			where: whereQueries,
+			take: pageSize,
+			skip: request.query.page * pageSize || 0
+		});
 		response.status(200).json(memes);
 	} catch (error) {
 		console.error(error); // debugging

@@ -12,6 +12,7 @@ import { ValidationError } from "../helpers/ValidationError";
 import { hash } from "bcrypt";
 import { authenticate } from "../helpers/authenticationHelpers";
 import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
+import { defaultTakeAmount } from "../helpers/constants";
 
 const router = express.Router();
 const hashRounds = 6;
@@ -47,7 +48,12 @@ router.get("/", async (request, response) => {
 		const queries = ["name"];
 		const isSearch = ["name"];
 		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
-		const users = await userRepo.find({ where: whereQueries });
+		const pageSize = request.query.pageSize || defaultTakeAmount;
+		const users = await userRepo.find({
+			where: whereQueries,
+			take: pageSize,
+			skip: request.query.page * pageSize || 0
+		});
 		const userNames: Array<string> = [];
 		users.forEach(user => {
 			userNames.push(user.username);

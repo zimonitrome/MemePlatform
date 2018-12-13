@@ -12,6 +12,7 @@ import {
 } from "../helpers/storageHelper";
 import { v4 } from "uuid";
 import { resizeImage } from "../helpers/memeGenerator";
+import { defaultTakeAmount } from "../helpers/constants";
 
 const router = express.Router();
 
@@ -64,7 +65,13 @@ router.get("/", async (request, response) => {
 		const queries = ["name", "username"];
 		const isSearch = ["name"];
 		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
-		const memeTemplates = await memeTemplateRepo.find({ where: whereQueries });
+		const pageSize = request.query.pageSize || defaultTakeAmount;
+		const memeTemplates = await memeTemplateRepo.find({
+			where: whereQueries,
+			take: pageSize,
+			skip: request.query.page * pageSize || 0
+		});
+
 		response.status(200).json(memeTemplates);
 	} catch (error) {
 		console.error(error); // debugging
