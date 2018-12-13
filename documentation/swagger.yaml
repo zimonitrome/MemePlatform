@@ -34,7 +34,7 @@ paths:
           schema:
             $ref: "#/definitions/User"
       responses:
-        204:
+        201:
           description: "User successfully registered"
         400:
           description: "Bad Request, see error message"

@@ -30,7 +30,7 @@ router.post("/", async (request, response) => {
 
 		const userRepo = getRepository(User);
 		await userRepo.save(user);
-		response.status(204).end();
+		response.status(201).end();
 	} catch (error) {
 		console.error(error); // debugging
 		if (error instanceof ValidationError) {
@@ -48,7 +48,11 @@ router.get("/", async (request, response) => {
 		const isSearch = ["name"];
 		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
 		const users = await userRepo.find({ where: whereQueries });
-		response.status(200).json(users);
+		const userNames: Array<string> = [];
+		users.forEach(user => {
+			userNames.push(user.username);
+		});
+		response.status(200).json(userNames);
 	} catch (error) {
 		console.error(error); // debugging
 		response.status(500).end();
