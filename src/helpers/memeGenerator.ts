@@ -9,6 +9,7 @@ import { MemeTemplate } from "../repository/entities";
 import fetch from "node-fetch";
 import { v4 } from "uuid";
 import { uploadImage } from "./storageHelper";
+import { ValidationError } from "./ValidationError";
 
 interface ImageInfo {
 	width: number;
@@ -21,24 +22,31 @@ export const createMeme = async (
 	bottomText: string
 ): Promise<string> =>
 	new Promise(async (resolve, reject) => {
-		const memeTemplateRepo = getRepository(MemeTemplate);
-		const memeTemplate = await memeTemplateRepo.findOneOrFail({
-			where: { id: templateId }
-		});
-		const response = await fetch(memeTemplate.imageSource);
+		try {
+			const memeTemplateRepo = getRepository(MemeTemplate);
+			const memeTemplate = await memeTemplateRepo.findOneOrFail({
+				where: { id: templateId }
+			});
+			const response = await fetch(memeTemplate.imageSource);
 
-		const memeImage = await generateMemeImage(
-			await response.buffer(),
-			topText,
-			bottomText
-		);
+			const memeImage = await generateMemeImage(
+				await response.buffer(),
+				topText,
+				bottomText
+			);
 
-		const imageInfo = await uploadImage(
-			memeImage,
-			`memes/${v4()}`,
-			"image/jpg"
-		);
-		resolve(imageInfo.Location);
+			const imageInfo = await uploadImage(
+				memeImage,
+				`memes/${v4()}`,
+				"image/jpg"
+			);
+			resolve(imageInfo.Location);
+		} catch (error) {
+			if (error.name === "EntityNotFound") {
+				reject(new ValidationError("templateId does not exist."));
+			}
+			reject(error);
+		}
 	}) as Promise<string>;
 
 export const resizeImage = async (
@@ -46,24 +54,28 @@ export const resizeImage = async (
 	maxSize: number
 ): Promise<Buffer> =>
 	new Promise(async (resolve, reject) => {
-		// tslint:disable-next-line:no-any
-		const image: any = await loadImageAsync(inputImage);
+		try {
+			// tslint:disable-next-line:no-any
+			const image: any = await loadImageAsync(inputImage);
 
-		const newWidth =
-			image.width > image.height
-				? maxSize
-				: maxSize * (image.width / image.height);
-		const newHeight =
-			image.width > image.height
-				? maxSize * (image.height / image.width)
-				: maxSize;
+			const newWidth =
+				image.width > image.height
+					? maxSize
+					: maxSize * (image.width / image.height);
+			const newHeight =
+				image.width > image.height
+					? maxSize * (image.height / image.width)
+					: maxSize;
 
-		const canvas = Canvas.createCanvas(newWidth, newHeight);
-		const ctx = canvas.getContext("2d");
+			const canvas = Canvas.createCanvas(newWidth, newHeight);
+			const ctx = canvas.getContext("2d");
 
-		ctx.drawImage(image, 0, 0, newWidth, newHeight);
+			ctx.drawImage(image, 0, 0, newWidth, newHeight);
 
-		resolve(canvas.toBuffer());
+			resolve(canvas.toBuffer());
+		} catch (error) {
+			reject(error);
+		}
 	}) as Promise<Buffer>;
 
 const generateMemeImage = async (
@@ -73,21 +85,25 @@ const generateMemeImage = async (
 	// tslint:disable-next-line:no-any
 ): Promise<Buffer> =>
 	new Promise(async (resolve, reject) => {
-		// tslint:disable-next-line:no-any
-		const image: any = await loadImageAsync(imageBuffer);
+		try {
+			// tslint:disable-next-line:no-any
+			const image: any = await loadImageAsync(imageBuffer);
 
-		const imageSize = { width: image.width, height: image.height };
+			const imageSize = { width: image.width, height: image.height };
 
-		const canvas = Canvas.createCanvas(imageSize.width, imageSize.height);
-		const ctx = canvas.getContext("2d");
+			const canvas = Canvas.createCanvas(imageSize.width, imageSize.height);
+			const ctx = canvas.getContext("2d");
 
-		ctx.drawImage(image, 0, 0);
+			ctx.drawImage(image, 0, 0);
 
-		drawText(canvas, imageSize, topText || "", "top");
-		drawText(canvas, imageSize, bottomText || "", "bottom");
-		const buffer = canvas.toBuffer();
+			drawText(canvas, imageSize, topText || "", "top");
+			drawText(canvas, imageSize, bottomText || "", "bottom");
+			const buffer = canvas.toBuffer();
 
-		resolve(buffer);
+			resolve(buffer);
+		} catch (error) {
+			reject(error);
+		}
 	}) as Promise<Buffer>;
 
 const drawText = (

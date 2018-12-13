@@ -97,9 +97,12 @@ router.delete("/:templateId", async (request, response) => {
 		});
 		authenticate(request.headers.authorization, memeTemplate.username);
 
-		await deleteImage(pathFromUrl(memeTemplate.imageSource)).catch(_e => {
-			throw new Error();
-		});
+		const a = await deleteImage(pathFromUrl(memeTemplate.imageSource)).catch(
+			_e => {
+				throw new Error();
+			}
+		);
+		console.log(a);
 
 		await memeTemplateRepo.delete({ id: request.params.templateId });
 
