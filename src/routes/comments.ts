@@ -2,7 +2,11 @@ import express from "express";
 import { getRepository, Repository, Like } from "typeorm";
 import { Comment, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
-import { ValidationError } from "../helpers/ValidationError";
+import {
+	CustomError,
+	customErrorResponse,
+	dbErrorToCustomError
+} from "../helpers/CustomError";
 import { authorize } from "../helpers/authorizationHelpers";
 import { defaultTakeAmount } from "../helpers/constants";
 
@@ -24,12 +28,7 @@ router.post("/", async (request, response) => {
 		const savedComment = await commentRepo.save(comment);
 		response.status(200).json(savedComment);
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
@@ -47,22 +46,18 @@ router.get("/:memeId", async (request, response) => {
 		});
 		response.status(200).json(comments);
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
 router.patch("/:commentId", async (request, response) => {
 	try {
-		// TODO: change documentation to state that this consumes a { text: "newcomment" } instead
 		const commentRepo = getRepository(Comment);
-		const comment = await commentRepo.findOneOrFail({
-			id: request.params.commentId
-		});
+		const comment = await commentRepo
+			.findOneOrFail({
+				id: request.params.commentId
+			})
+			.catch(dbErrorToCustomError);
 		authorize(request.headers.authorization, comment.username);
 
 		Comment.validateText(request.body.text);
@@ -76,23 +71,18 @@ router.patch("/:commentId", async (request, response) => {
 
 		response.status(200).json(updatedComment);
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
 router.delete("/:commentId", async (request, response) => {
 	try {
 		const commentRepo = getRepository(Comment);
-		const comment = await commentRepo.findOneOrFail({
-			id: request.params.commentId
-		});
+		const comment = await commentRepo
+			.findOneOrFail({
+				id: request.params.commentId
+			})
+			.catch(dbErrorToCustomError);
 
 		authorize(request.headers.authorization, comment.username);
 		await commentRepo.update(
@@ -101,15 +91,7 @@ router.delete("/:commentId", async (request, response) => {
 		);
 		response.status(204).end();
 	} catch (error) {
-		console.error(error); // debugging
-		// TODO: which one to check
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn, getRepository } from "typeorm";
 import { Meme, User } from ".";
-import { ValidationError } from "../../helpers/ValidationError";
+import { CustomError } from "../../helpers/CustomError";
 
 @Entity()
 export class Vote {
@@ -20,7 +20,7 @@ export class Vote {
 		if (vote === -1 || vote === 1) {
 			return;
 		} else {
-			throw new ValidationError("Vote must be -1 or 1.");
+			throw new CustomError("Vote must be -1 or 1.");
 		}
 	}
 
@@ -30,10 +30,10 @@ export class Vote {
 			if (await memeRepo.findOne({ id: memeId })) {
 				return;
 			} else {
-				throw new ValidationError("Meme does not exist.");
+				throw new CustomError("Meme does not exist.");
 			}
 		} else {
-			throw new ValidationError("Missing parameter memeId.");
+			throw new CustomError("Missing parameter memeId.");
 		}
 	}
 
@@ -43,10 +43,10 @@ export class Vote {
 			if (await userRepo.findOne({ where: { username } })) {
 				return true;
 			} else {
-				throw new ValidationError("User does not exist.");
+				throw new CustomError("User does not exist.");
 			}
 		} else {
-			throw new ValidationError("Missing parameter username.");
+			throw new CustomError("Missing parameter username.");
 		}
 	}
 

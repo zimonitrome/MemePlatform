@@ -19,5 +19,5 @@ export default async () => {
 			entities.User,
 			entities.Vote
 		]
-	}).catch(console.log);
+	});
 };

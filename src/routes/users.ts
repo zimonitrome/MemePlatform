@@ -8,7 +8,11 @@ import {
 	Comment
 } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
-import { ValidationError } from "../helpers/ValidationError";
+import {
+	CustomError,
+	customErrorResponse,
+	dbErrorToCustomError
+} from "../helpers/CustomError";
 import { hash } from "bcrypt";
 import { authorize } from "../helpers/authorizationHelpers";
 import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
@@ -33,12 +37,7 @@ router.post("/", async (request, response) => {
 		await userRepo.save(user);
 		response.status(201).end();
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
@@ -56,8 +55,7 @@ router.get("/", async (request, response) => {
 		});
 		response.status(200).json(users.map(user => user.username));
 	} catch (error) {
-		console.error(error); // debugging
-		response.status(500).end();
+		customErrorResponse(response, error);
 	}
 });
 
@@ -71,20 +69,15 @@ router.patch("/:username", async (request, response) => {
 			await hash(request.body.password, hashRounds)
 		);
 		const userRepo = getRepository(User);
-		await userRepo.update(
-			{ username: request.params.username },
-			{ passwordHash: updatedUser.passwordHash }
-		);
+		await userRepo
+			.update(
+				{ username: request.params.username },
+				{ passwordHash: updatedUser.passwordHash }
+			)
+			.catch(dbErrorToCustomError);
 		response.status(204).end();
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
@@ -97,10 +90,14 @@ router.delete("/:username", async (request, response) => {
 		const memeRepo = getRepository(Meme);
 		const commentRepo = getRepository(Comment);
 
-		await userRepo.delete({ username: request.params.username });
+		// Removes user from database
+		await userRepo
+			.delete({ username: request.params.username })
+			.catch(dbErrorToCustomError);
 
+		// Delete all votes from user
+		// Also updates votecount on all memes user voted on
 		{
-			// Delete all votes and updates vote count on voted memes
 			const votes = await voteRepo.find({ username: request.params.username });
 			await voteRepo.delete({ username: request.params.username });
 			votes.forEach(async vote => {
@@ -115,6 +112,7 @@ router.delete("/:username", async (request, response) => {
 			});
 		}
 
+		// Removes templates made by the user
 		{
 			const templateRepo = getRepository(MemeTemplate);
 			// Remove all template images crated by user
@@ -124,7 +122,7 @@ router.delete("/:username", async (request, response) => {
 			templates.forEach(template => {
 				deleteImage(pathFromUrl(template.imageSource));
 			});
-			// Blanks templateId on all the memes made by templates
+			// Blanks templateId on all the memes made using user's templates
 			const templateMemes = await memeRepo.find({
 				templateId: request.params.templateId
 			});
@@ -135,8 +133,8 @@ router.delete("/:username", async (request, response) => {
 			await templateRepo.delete({ username: request.params.username });
 		}
 
+		// Blanks all memes made by user
 		{
-			// "Blanks" memes made by the user
 			const userMemes = await memeRepo.find({
 				where: { username: request.params.username }
 			});
@@ -151,8 +149,8 @@ router.delete("/:username", async (request, response) => {
 			});
 		}
 
+		// Blanks comments made by the user
 		{
-			// "Blanks" comments made by the user
 			const comments = await commentRepo.find({
 				where: { username: request.params.username }
 			});
@@ -166,13 +164,6 @@ router.delete("/:username", async (request, response) => {
 
 		response.status(204).end();
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });

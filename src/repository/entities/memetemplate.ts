@@ -1,12 +1,12 @@
 import { Entity, Column, PrimaryGeneratedColumn, getRepository } from "typeorm";
 import { User } from ".";
-import { ValidationError } from "../../helpers/ValidationError";
+import { CustomError } from "../../helpers/CustomError";
 
 @Entity()
 export class MemeTemplate {
 	constructor(username: string, imageSource: string, name?: string) {
 		this.username = username;
-		this.imageSource = imageSource; // Add validation to check that image exists
+		this.imageSource = imageSource;
 		this.name = name;
 	}
 
@@ -21,10 +21,10 @@ export class MemeTemplate {
 			if (await userRepo.findOne({ username })) {
 				return;
 			} else {
-				throw new ValidationError("User does not exist.");
+				throw new CustomError("User does not exist.");
 			}
 		} else {
-			throw new ValidationError("Missing parameter username.");
+			throw new CustomError("Missing parameter username.");
 		}
 	}
 
@@ -34,7 +34,7 @@ export class MemeTemplate {
 			if (regexp.test(name)) {
 				return;
 			} else {
-				throw new ValidationError(
+				throw new CustomError(
 					"Given name must be between 1 and 300 characters."
 				);
 			}

@@ -2,7 +2,11 @@ import express from "express";
 import { getRepository, Repository, Like } from "typeorm";
 import { Vote, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
-import { ValidationError } from "../helpers/ValidationError";
+import {
+	CustomError,
+	customErrorResponse,
+	dbErrorToCustomError
+} from "../helpers/CustomError";
 import { authorize } from "../helpers/authorizationHelpers";
 import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from "constants";
 
@@ -25,6 +29,7 @@ router.put("/:memeId", async (request, response) => {
 		});
 
 		const memeRepo = getRepository(Meme);
+
 		// Forced to split vote save due to typeorm/PostgreSQL bug
 		if (existingVote) {
 			await voteRepo.update(
@@ -32,9 +37,8 @@ router.put("/:memeId", async (request, response) => {
 				vote
 			);
 			if (existingVote.vote === vote.vote) {
-				throw new ValidationError("Vote like this already exists.");
+				throw new CustomError("Vote like this already exists.");
 			}
-
 			// Also updates votecount on meme
 			switch (vote.vote) {
 				case 1:
@@ -58,12 +62,7 @@ router.put("/:memeId", async (request, response) => {
 		}
 		response.status(200).json(vote);
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
@@ -74,20 +73,15 @@ router.get("/:memeId", async (request, response) => {
 
 		const voteRepo = getRepository(Vote);
 
-		const vote = await voteRepo.findOneOrFail({
-			memeId: request.params.memeId,
-			username: request.body.username
-		});
+		const vote = await voteRepo
+			.findOneOrFail({
+				memeId: request.params.memeId,
+				username: request.body.username
+			})
+			.catch(dbErrorToCustomError);
 		response.status(200).json(vote);
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
@@ -97,14 +91,21 @@ router.delete("/:memeId", async (request, response) => {
 
 		authorize(request.headers.authorization, request.body.username);
 
-		const vote = await voteRepo.findOneOrFail({
-			where: { memeId: request.params.memeId, username: request.body.username }
-		});
+		const vote = await voteRepo
+			.findOneOrFail({
+				where: {
+					memeId: request.params.memeId,
+					username: request.body.username
+				}
+			})
+			.catch(dbErrorToCustomError);
 
-		await voteRepo.delete({
-			memeId: request.params.memeId,
-			username: request.body.username
-		});
+		await voteRepo
+			.delete({
+				memeId: request.params.memeId,
+				username: request.body.username
+			})
+			.catch(dbErrorToCustomError);
 
 		const memeRepo = getRepository(Meme);
 		switch (vote.vote) {
@@ -118,14 +119,7 @@ router.delete("/:memeId", async (request, response) => {
 
 		response.status(204).end();
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 

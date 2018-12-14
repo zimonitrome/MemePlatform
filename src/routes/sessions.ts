@@ -3,7 +3,7 @@ import { User } from "../repository/entities";
 import { getRepository } from "typeorm";
 import { compare } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { ValidationError } from "../helpers/ValidationError";
+import { CustomError, customErrorResponse } from "../helpers/CustomError";
 
 const router = express.Router();
 
@@ -19,8 +19,7 @@ router.post("/", async (request, response) => {
 		User.validatePassword(password);
 
 		if (grant_type !== "password") {
-			response.status(400).json({ error: "unsupported_grant_type" });
-			return;
+			throw new CustomError("unsupported_grant_type");
 		}
 
 		const userRepo = getRepository(User);
@@ -32,15 +31,9 @@ router.post("/", async (request, response) => {
 			});
 			response.status(200).json({ accessToken });
 		} else {
-			response.status(400).json({ error: "invalid_grant" });
-			return;
+			throw new CustomError("invalid_grant");
 		}
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json({ error: "invalid_request" });
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });

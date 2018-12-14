@@ -6,7 +6,7 @@ import {
 	getRepository
 } from "typeorm";
 import { MemeTemplate, User } from ".";
-import { ValidationError } from "../../helpers/ValidationError";
+import { CustomError } from "../../helpers/CustomError";
 
 @Entity()
 export class Meme {
@@ -35,10 +35,10 @@ export class Meme {
 			if (await templateRepo.findOne({ id: templateId })) {
 				return;
 			} else {
-				throw new ValidationError("Template does not exist.");
+				throw new CustomError("Template does not exist.");
 			}
 		} else {
-			throw new ValidationError("Missing parameter templateId.");
+			throw new CustomError("Missing parameter templateId.");
 		}
 	}
 
@@ -48,10 +48,10 @@ export class Meme {
 			if (await userRepo.findOne({ username })) {
 				return;
 			} else {
-				throw new ValidationError("User does not exist.");
+				throw new CustomError("User does not exist.");
 			}
 		} else {
-			throw new ValidationError("Missing parameter username.");
+			throw new CustomError("Missing parameter username.");
 		}
 	}
 
@@ -61,7 +61,7 @@ export class Meme {
 			if (regexp.test(name)) {
 				return;
 			} else {
-				throw new ValidationError(
+				throw new CustomError(
 					"Given name must be between 1 and 300 characters."
 				);
 			}

@@ -2,7 +2,11 @@ import express from "express";
 import { getRepository, Repository, Like } from "typeorm";
 import { Meme, Vote, Comment } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
-import { ValidationError } from "../helpers/ValidationError";
+import {
+	CustomError,
+	customErrorResponse,
+	dbErrorToCustomError
+} from "../helpers/CustomError";
 import { authorize } from "../helpers/authorizationHelpers";
 import { createMeme } from "../helpers/memeGenerator";
 import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
@@ -11,8 +15,6 @@ import { defaultTakeAmount } from "../helpers/constants";
 const router = express.Router();
 
 router.post("/", async (request, response) => {
-	// TODO: validate parameters
-
 	try {
 		authorize(request.headers.authorization, request.body.username);
 		const imageSource = await createMeme(
@@ -33,13 +35,7 @@ router.post("/", async (request, response) => {
 		const savedMeme = await memeRepo.save(meme);
 		response.status(200).json(savedMeme);
 	} catch (error) {
-		console.error(error); // debugging
-
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
@@ -57,8 +53,7 @@ router.get("/", async (request, response) => {
 		});
 		response.status(200).json(memes);
 	} catch (error) {
-		console.error(error); // debugging
-		response.status(500).end();
+		customErrorResponse(response, error);
 	}
 });
 
@@ -70,12 +65,7 @@ router.get("/:memeId", async (request, response) => {
 		});
 		response.status(200).json(meme);
 	} catch (error) {
-		console.error(error); // debugging
-		if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
@@ -83,7 +73,9 @@ router.delete("/:memeId", async (request, response) => {
 	try {
 		const memeRepo = getRepository(Meme);
 
-		const meme = await memeRepo.findOneOrFail({ id: request.params.memeId });
+		const meme = await memeRepo
+			.findOneOrFail({ id: request.params.memeId })
+			.catch(dbErrorToCustomError);
 		authorize(request.headers.authorization, meme.username);
 
 		deleteImage(pathFromUrl(meme.imageSource));
@@ -95,14 +87,7 @@ router.delete("/:memeId", async (request, response) => {
 
 		response.status(204).end();
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 

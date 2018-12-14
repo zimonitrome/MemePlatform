@@ -105,8 +105,14 @@ paths:
           description: "Bad Request, see error message"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
     delete:
@@ -131,8 +137,14 @@ paths:
           description: "Bad Request, see error message"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
 
@@ -190,6 +202,10 @@ paths:
             $ref: "#/definitions/Meme"
         400:
           description: "Bad Request, see error message"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
           schema:
             $ref: "#/definitions/Error"
         500:
@@ -251,6 +267,8 @@ paths:
             $ref: "#/definitions/Meme"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
     delete:
@@ -275,8 +293,14 @@ paths:
           description: "Bad Request, see error message"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
 
@@ -305,6 +329,10 @@ paths:
             $ref: "#/definitions/MemeTemplate"
         400:
           description: "Bad Request, see error message"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
           schema:
             $ref: "#/definitions/Error"
         500:
@@ -361,6 +389,8 @@ paths:
             $ref: "#/definitions/MemeTemplate"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
     delete:
@@ -385,8 +415,14 @@ paths:
           description: "Bad Request, see error message"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
 
@@ -416,6 +452,10 @@ paths:
             $ref: "#/definitions/Comment"
         400:
           description: "Bad Request, see error message"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
           schema:
             $ref: "#/definitions/Error"
         500:
@@ -488,8 +528,14 @@ paths:
           description: "Bad Request, see error message"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
     delete:
@@ -514,8 +560,14 @@ paths:
           description: "Bad Request, see error message"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
 
@@ -551,6 +603,10 @@ paths:
           description: "Bad Request, see error message"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
     get:
@@ -583,6 +639,8 @@ paths:
             $ref: "#/definitions/Error"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
     delete:
@@ -616,8 +674,14 @@ paths:
           description: "Bad Request, see error message"
           schema:
             $ref: "#/definitions/Error"
+        401:
+          description: "Unauthorized request."
+          schema:
+            $ref: "#/definitions/Error"
         404:
           description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
         500:
           description: "Internal Server Error"
 

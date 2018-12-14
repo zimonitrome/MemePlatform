@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn } from "typeorm";
-import { ValidationError } from "../../helpers/ValidationError";
+import { CustomError } from "../../helpers/CustomError";
 
 @Entity()
 export class User {
@@ -21,18 +21,18 @@ export class User {
 				if (charregexp.test(username)) {
 					return;
 				} else {
-					throw new ValidationError(
+					throw new CustomError(
 						// tslint:disable-next-line:max-line-length
 						"Username can contain only '-', '_' or alphanumerical characters, and must start and end with alphanumerical characters. '-' and '_' cannot be repeated in succession."
 					);
 				}
 			} else {
-				throw new ValidationError(
+				throw new CustomError(
 					"Username must be between 4 and 30 characters long."
 				);
 			}
 		} else {
-			throw new ValidationError("Missing parameter username.");
+			throw new CustomError("Missing parameter username.");
 		}
 	}
 
@@ -44,17 +44,17 @@ export class User {
 				if (charregexp.test(password)) {
 					return;
 				} else {
-					throw new ValidationError(
+					throw new CustomError(
 						"Password must contain at least one letter and one number, and must only contain letters or numbers."
 					);
 				}
 			} else {
-				throw new ValidationError(
+				throw new CustomError(
 					"Password must be between 8 and 30 characters long."
 				);
 			}
 		} else {
-			throw new ValidationError("Missing parameter password.");
+			throw new CustomError("Missing parameter password.");
 		}
 	}
 

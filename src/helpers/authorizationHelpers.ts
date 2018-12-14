@@ -1,5 +1,5 @@
 import { verify } from "jsonwebtoken";
-import { ValidationError } from "./ValidationError";
+import { CustomError } from "./CustomError";
 
 interface AccessToken {
 	sub: string;
@@ -25,9 +25,9 @@ export const verifyHeader = (
 export const authorize = (header: string | undefined, username: string) => {
 	const accessToken = verifyHeader(header);
 	if (!accessToken) {
-		throw new ValidationError("Invalid token.");
+		throw new CustomError("Invalid token.");
 	}
 	if (accessToken.sub !== username) {
-		throw new ValidationError("Unauthorized request.");
+		throw new CustomError("Unauthorized request.", 401);
 	}
 };

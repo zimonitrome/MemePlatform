@@ -2,7 +2,11 @@ import express from "express";
 import { getRepository, Repository, Like, IsNull } from "typeorm";
 import { MemeTemplate, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
-import { ValidationError } from "../helpers/ValidationError";
+import {
+	CustomError,
+	customErrorResponse,
+	dbErrorToCustomError
+} from "../helpers/CustomError";
 import { authorize } from "../helpers/authorizationHelpers";
 import multer from "multer";
 import {
@@ -25,11 +29,11 @@ router.post("/", multerObj, async (request, response) => {
 		authorize(request.headers.authorization, request.body.username);
 
 		if (!request.file) {
-			throw new ValidationError("No file supplied.");
+			throw new CustomError("No file supplied.");
 		}
 
 		if (!request.file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-			throw new ValidationError(
+			throw new CustomError(
 				"Unsupported image format. Should be png, jpg or gif."
 			);
 		}
@@ -50,12 +54,7 @@ router.post("/", multerObj, async (request, response) => {
 		const savedTemplate = await memeTemplateRepo.save(memeTemplate);
 		response.status(200).json(savedTemplate);
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
@@ -73,8 +72,7 @@ router.get("/", async (request, response) => {
 		});
 		response.status(200).json(memeTemplates);
 	} catch (error) {
-		console.error(error); // debugging
-		response.status(500).end();
+		customErrorResponse(response, error);
 	}
 });
 
@@ -86,21 +84,18 @@ router.get("/:templateId", async (request, response) => {
 		});
 		response.status(200).json(memeTemplate);
 	} catch (error) {
-		console.error(error); // debugging
-		if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 
 router.delete("/:templateId", async (request, response) => {
 	try {
 		const memeTemplateRepo = getRepository(MemeTemplate);
-		const memeTemplate = await memeTemplateRepo.findOneOrFail({
-			id: request.params.templateId
-		});
+		const memeTemplate = await memeTemplateRepo
+			.findOneOrFail({
+				id: request.params.templateId
+			})
+			.catch(dbErrorToCustomError);
 		authorize(request.headers.authorization, memeTemplate.username);
 
 		const a = await deleteImage(pathFromUrl(memeTemplate.imageSource)).catch(
@@ -108,7 +103,6 @@ router.delete("/:templateId", async (request, response) => {
 				throw new Error();
 			}
 		);
-		console.log(a);
 
 		await memeTemplateRepo.delete({ id: request.params.templateId });
 
@@ -123,14 +117,7 @@ router.delete("/:templateId", async (request, response) => {
 
 		response.status(204).end();
 	} catch (error) {
-		console.error(error); // debugging
-		if (error instanceof ValidationError) {
-			response.status(400).json(error.jsonError);
-		} else if (error.name === "EntityNotFound") {
-			response.status(404).end();
-		} else {
-			response.status(500).end();
-		}
+		customErrorResponse(response, error);
 	}
 });
 

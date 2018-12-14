@@ -9,7 +9,7 @@ import { MemeTemplate } from "../repository/entities";
 import fetch from "node-fetch";
 import { v4 } from "uuid";
 import { uploadImage } from "./storageHelper";
-import { ValidationError } from "./ValidationError";
+import { CustomError } from "./CustomError";
 
 interface ImageInfo {
 	width: number;
@@ -43,7 +43,7 @@ export const createMeme = async (
 			resolve(imageInfo.Location);
 		} catch (error) {
 			if (error.name === "EntityNotFound") {
-				reject(new ValidationError("templateId does not exist."));
+				reject(new CustomError("templateId does not exist."));
 			}
 			reject(error);
 		}

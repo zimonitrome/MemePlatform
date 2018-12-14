@@ -9,7 +9,6 @@ import commentsRouter from "./routes/comments";
 import sessionsRouter from "./routes/sessions";
 import { getConnection } from "typeorm";
 import connectToDB from "./repository/dbConnection";
-import insertMockData from "./repository/insertMockData";
 import bodyParser, { urlencoded } from "body-parser";
 
 export const rebuildDB = false;
@@ -19,8 +18,7 @@ const app = express();
 
 (async () => {
 	await connectToDB();
-	await getConnection().synchronize(rebuildDB); // does the thing
-	// if (rebuildDB) await insertMockData();
+	await getConnection().synchronize(rebuildDB);
 
 	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded({ extended: false }));
