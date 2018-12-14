@@ -11,14 +11,12 @@ import { getConnection } from "typeorm";
 import connectToDB from "./repository/dbConnection";
 import bodyParser, { urlencoded } from "body-parser";
 
-export const rebuildDB = false;
-
 const port = process.env.PORT || 80;
 const app = express();
 
 (async () => {
 	await connectToDB();
-	await getConnection().synchronize(rebuildDB);
+	await getConnection();
 
 	app.use(bodyParser.json());
 	app.use(bodyParser.urlencoded({ extended: false }));
