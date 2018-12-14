@@ -10,15 +10,15 @@ export class MemeTemplate {
 		this.name = name;
 	}
 
-	validate() {
-		MemeTemplate.validateUsername(this.username);
+	async validate() {
+		await MemeTemplate.validateUsername(this.username);
 		MemeTemplate.validateName(this.name);
 	}
 
-	static validateUsername(username: string) {
+	static async validateUsername(username: string) {
 		if (username) {
 			const userRepo = getRepository(User);
-			if (userRepo.find({ where: { username } })) {
+			if (await userRepo.findOne({ username })) {
 				return;
 			} else {
 				throw new ValidationError("User does not exist.");

@@ -10,8 +10,9 @@ import {
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
 import { hash } from "bcrypt";
-import { authenticate } from "../helpers/authenticationHelpers";
+import { authorize } from "../helpers/authorizationHelpers";
 import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
+import { defaultTakeAmount } from "../helpers/constants";
 
 const router = express.Router();
 const hashRounds = 6;
@@ -30,7 +31,7 @@ router.post("/", async (request, response) => {
 
 		const userRepo = getRepository(User);
 		await userRepo.save(user);
-		response.status(204).end();
+		response.status(201).end();
 	} catch (error) {
 		console.error(error); // debugging
 		if (error instanceof ValidationError) {
@@ -44,21 +45,25 @@ router.post("/", async (request, response) => {
 router.get("/", async (request, response) => {
 	try {
 		const userRepo = getRepository(User);
-		const queries = ["name"];
-		const isSearch = ["name"];
+		const queries = ["username"];
+		const isSearch = ["username"];
 		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
-		const users = await userRepo.find({ where: whereQueries });
-		response.status(200).json(users);
+		const pageSize = request.query.pageSize || defaultTakeAmount;
+		const users = await userRepo.find({
+			where: whereQueries,
+			take: pageSize,
+			skip: request.query.page * pageSize || 0
+		});
+		response.status(200).json(users.map(user => user.username));
 	} catch (error) {
 		console.error(error); // debugging
 		response.status(500).end();
 	}
 });
 
-router.put("/:username", async (request, response) => {
+router.patch("/:username", async (request, response) => {
 	try {
-		// TODO: Maybe update docs idk?
-		authenticate(request.headers.authorization, request.params.username);
+		authorize(request.headers.authorization, request.params.username);
 
 		User.validatePassword(request.body.password);
 		const updatedUser = new User(
@@ -85,7 +90,7 @@ router.put("/:username", async (request, response) => {
 
 router.delete("/:username", async (request, response) => {
 	try {
-		authenticate(request.headers.authorization, request.params.username);
+		authorize(request.headers.authorization, request.params.username);
 
 		const userRepo = getRepository(User);
 		const voteRepo = getRepository(Vote);

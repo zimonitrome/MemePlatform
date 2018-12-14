@@ -3,7 +3,7 @@ import { getRepository, Repository, Like, IsNull } from "typeorm";
 import { MemeTemplate, Meme } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
-import { authenticate } from "../helpers/authenticationHelpers";
+import { authorize } from "../helpers/authorizationHelpers";
 import multer from "multer";
 import {
 	uploadImage,
@@ -12,6 +12,7 @@ import {
 } from "../helpers/storageHelper";
 import { v4 } from "uuid";
 import { resizeImage } from "../helpers/memeGenerator";
+import { defaultTakeAmount } from "../helpers/constants";
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ Error.stackTraceLimit = Infinity;
 
 router.post("/", multerObj, async (request, response) => {
 	try {
-		authenticate(request.headers.authorization, request.body.username);
+		authorize(request.headers.authorization, request.body.username);
 
 		if (!request.file) {
 			throw new ValidationError("No file supplied.");
@@ -44,7 +45,7 @@ router.post("/", multerObj, async (request, response) => {
 			imageInfo.Location,
 			request.body.name
 		);
-		memeTemplate.validate();
+		await memeTemplate.validate();
 		const memeTemplateRepo = getRepository(MemeTemplate);
 		const savedTemplate = await memeTemplateRepo.save(memeTemplate);
 		response.status(200).json(savedTemplate);
@@ -64,7 +65,12 @@ router.get("/", async (request, response) => {
 		const queries = ["name", "username"];
 		const isSearch = ["name"];
 		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
-		const memeTemplates = await memeTemplateRepo.find({ where: whereQueries });
+		const pageSize = request.query.pageSize || defaultTakeAmount;
+		const memeTemplates = await memeTemplateRepo.find({
+			where: whereQueries,
+			take: pageSize,
+			skip: request.query.page * pageSize || 0
+		});
 		response.status(200).json(memeTemplates);
 	} catch (error) {
 		console.error(error); // debugging
@@ -95,7 +101,7 @@ router.delete("/:templateId", async (request, response) => {
 		const memeTemplate = await memeTemplateRepo.findOneOrFail({
 			id: request.params.templateId
 		});
-		authenticate(request.headers.authorization, memeTemplate.username);
+		authorize(request.headers.authorization, memeTemplate.username);
 
 		const a = await deleteImage(pathFromUrl(memeTemplate.imageSource)).catch(
 			_e => {

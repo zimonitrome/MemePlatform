@@ -23,17 +23,17 @@ export class Comment {
 		this.parentCommentId = parentCommentId;
 	}
 
-	validate() {
-		Comment.validateMemeId(this.memeId);
-		Comment.validateParentCommentId(this.parentCommentId);
-		Comment.validateText(this.text);
-		Comment.validateUsername(this.username);
+	async validate() {
+		await Comment.validateMemeId(this.memeId);
+		await Comment.validateParentCommentId(this.parentCommentId);
+		await Comment.validateText(this.text);
+		await Comment.validateUsername(this.username);
 	}
 
-	static validateMemeId(memeId: number) {
+	static async validateMemeId(memeId: number) {
 		if (memeId) {
 			const memeRepo = getRepository(Meme);
-			if (memeRepo.find({ where: { id: memeId } })) {
+			if (await memeRepo.findOne({ id: memeId })) {
 				return;
 			} else {
 				throw new ValidationError("Meme does not exist.");
@@ -43,10 +43,10 @@ export class Comment {
 		}
 	}
 
-	static validateUsername(username: string) {
+	static async validateUsername(username: string) {
 		if (username) {
 			const userRepo = getRepository(User);
-			if (userRepo.find({ where: { username } })) {
+			if (await userRepo.findOne({ where: { username } })) {
 				return;
 			} else {
 				throw new ValidationError("User does not exist.");
@@ -56,10 +56,10 @@ export class Comment {
 		}
 	}
 
-	static validateParentCommentId(parentCommentId: number | undefined) {
+	static async validateParentCommentId(parentCommentId: number | undefined) {
 		if (parentCommentId) {
 			const commentRepo = getRepository(Comment);
-			if (commentRepo.find({ where: { id: parentCommentId } })) {
+			if (await commentRepo.findOne({ where: { id: parentCommentId } })) {
 				return;
 			} else {
 				throw new ValidationError("Parent comment does not exist.");

@@ -34,7 +34,7 @@ paths:
           schema:
             $ref: "#/definitions/User"
       responses:
-        204:
+        201:
           description: "User successfully registered"
         400:
           description: "Bad Request, see error message"
@@ -49,11 +49,21 @@ paths:
       produces:
         - "application/json"
       parameters:
-        - name: "name"
+        - name: "username"
           in: "query"
-          description: "search query for usernames"
+          description: "Search query for usernames"
           required: false
           type: "string"
+        - name: "pageSize"
+          in: "query"
+          description: "How many usernames to fetch"
+          required: false
+          type: "integer"
+        - name: "page"
+          in: "query"
+          description: "Which page to fetch"
+          required: false
+          type: "integer"
       responses:
         200:
           description: "Users successfully fetched"
@@ -64,7 +74,7 @@ paths:
         500:
           description: "Internal Server Error"
   /users/{username}:
-    put:
+    patch:
       tags:
         - "users"
       summary: "Edits a user"
@@ -76,12 +86,12 @@ paths:
           type: "string"
         - name: "username"
           in: "path"
-          description: "username of the user to edit"
+          description: "Username of the user to edit"
           required: true
           type: "string"
         - in: "body"
           name: "password"
-          description: "new password to update"
+          description: "New password to update"
           required: true
           schema:
             type: "object"
@@ -111,7 +121,7 @@ paths:
           type: "string"
         - name: "username"
           in: "path"
-          description: "username of the user to delete"
+          description: "Username of the user to delete"
           required: true
           type: "string"
       responses:
@@ -191,7 +201,7 @@ paths:
       parameters:
         - name: "name"
           in: "query"
-          description: "search query for names"
+          description: "Search query for names"
           required: false
           type: "string"
         - name: "templateId"
@@ -201,9 +211,19 @@ paths:
           type: "string"
         - name: "username"
           in: "query"
-          description: "name of user to get memes by"
+          description: "Name of user to get memes by"
           required: false
           type: "string"
+        - name: "pageSize"
+          in: "query"
+          description: "How many memes to fetch"
+          required: false
+          type: "integer"
+        - name: "page"
+          in: "query"
+          description: "Which page to fetch"
+          required: false
+          type: "integer"
       responses:
         200:
           description: "Memes successfully fetched"
@@ -221,7 +241,7 @@ paths:
       parameters:
         - name: "memeId"
           in: "path"
-          description: "id of the meme to get"
+          description: "ID of the meme to get"
           required: true
           type: "integer"
       responses:
@@ -245,7 +265,7 @@ paths:
           type: "string"
         - name: "memeId"
           in: "path"
-          description: "id of the meme to delete"
+          description: "ID of the meme to delete"
           required: true
           type: "integer"
       responses:
@@ -296,14 +316,24 @@ paths:
       parameters:
         - name: "username"
           in: "query"
-          description: "name of user to get templates by"
+          description: "Name of user to get templates by"
           required: false
           type: "string"
         - name: "name"
           in: "query"
-          description: "search query for names"
+          description: "Search query for names"
           required: false
           type: "string"
+        - name: "pageSize"
+          in: "query"
+          description: "How many templates to fetch"
+          required: false
+          type: "integer"
+        - name: "page"
+          in: "query"
+          description: "Which page to fetch"
+          required: false
+          type: "integer"
       responses:
         200:
           description: "Templates successfully fetched"
@@ -321,7 +351,7 @@ paths:
       parameters:
         - name: "templateId"
           in: "path"
-          description: "id of the template to get"
+          description: "ID of the template to get"
           required: true
           type: "integer"
       responses:
@@ -345,7 +375,7 @@ paths:
           type: "string"
         - name: "templateId"
           in: "path"
-          description: "id of the template to delete"
+          description: "ID of the template to delete"
           required: true
           type: "integer"
       responses:
@@ -398,9 +428,19 @@ paths:
       parameters:
         - name: "memeId"
           in: "path"
-          description: "Id of meme to get comments on"
+          description: "ID of meme to get comments on"
           required: true
           type: "string"
+        - name: "pageSize"
+          in: "query"
+          description: "How many comments to fetch"
+          required: false
+          type: "integer"
+        - name: "page"
+          in: "query"
+          description: "Which page to fetch"
+          required: false
+          type: "integer"
       responses:
         200:
           description: "Comments successfully fetched"
@@ -415,7 +455,7 @@ paths:
         500:
           description: "Internal Server Error"
   /comments/{commentId}:
-    put:
+    patch:
       tags:
         - "comments"
       summary: "Edit a comment"
@@ -481,7 +521,7 @@ paths:
 
   # ============== VOTES ==============
   /votes/{memeId}:
-    post:
+    put:
       tags:
         - "votes"
       summary: "Vote on a meme"
@@ -498,7 +538,7 @@ paths:
           type: "string"
         - name: "body"
           in: "body"
-          description: "username of the signed in user and vote to add"
+          description: "Username of the signed in user and vote to add"
           required: true
           schema:
             $ref: "#/definitions/NewVote"
@@ -525,7 +565,7 @@ paths:
           type: "integer"
         - name: "body"
           in: "body"
-          description: "name of the user"
+          description: "Name of the user"
           required: true
           schema:
             type: "object"
@@ -562,7 +602,7 @@ paths:
           type: "integer"
         - name: "body"
           in: "body"
-          description: "name of the user"
+          description: "Name of the user"
           required: true
           schema:
             type: "object"

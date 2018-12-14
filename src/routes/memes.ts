@@ -3,9 +3,10 @@ import { getRepository, Repository, Like } from "typeorm";
 import { Meme, Vote, Comment } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import { ValidationError } from "../helpers/ValidationError";
-import { authenticate } from "../helpers/authenticationHelpers";
+import { authorize } from "../helpers/authorizationHelpers";
 import { createMeme } from "../helpers/memeGenerator";
 import { deleteImage, pathFromUrl } from "../helpers/storageHelper";
+import { defaultTakeAmount } from "../helpers/constants";
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.post("/", async (request, response) => {
 	// TODO: validate parameters
 
 	try {
-		authenticate(request.headers.authorization, request.body.username);
+		authorize(request.headers.authorization, request.body.username);
 		const imageSource = await createMeme(
 			request.body.templateId,
 			request.body.topText,
@@ -26,7 +27,7 @@ router.post("/", async (request, response) => {
 			imageSource,
 			request.body.name
 		);
-		meme.validate();
+		await meme.validate();
 
 		const memeRepo = getRepository(Meme);
 		const savedMeme = await memeRepo.save(meme);
@@ -45,10 +46,15 @@ router.post("/", async (request, response) => {
 router.get("/", async (request, response) => {
 	try {
 		const memeRepo = getRepository(Meme);
-		const queries = ["name", "templateId", "username", "categoryId"];
+		const queries = ["name", "templateId", "username"];
 		const isSearch = ["name"];
 		const whereQueries = whereQueryBuilder(request.query, queries, isSearch);
-		const memes = await memeRepo.find({ where: whereQueries });
+		const pageSize = request.query.pageSize || defaultTakeAmount;
+		const memes = await memeRepo.find({
+			where: whereQueries,
+			take: pageSize,
+			skip: request.query.page * pageSize || 0
+		});
 		response.status(200).json(memes);
 	} catch (error) {
 		console.error(error); // debugging
@@ -78,7 +84,7 @@ router.delete("/:memeId", async (request, response) => {
 		const memeRepo = getRepository(Meme);
 
 		const meme = await memeRepo.findOneOrFail({ id: request.params.memeId });
-		authenticate(request.headers.authorization, meme.username);
+		authorize(request.headers.authorization, meme.username);
 
 		deleteImage(pathFromUrl(meme.imageSource));
 
