@@ -34,6 +34,11 @@ router.post("/", async (request, response) => {
 		);
 
 		const userRepo = getRepository(User);
+
+		if (await userRepo.findOne({ username: request.body.username })) {
+			throw new CustomError("User already exists", 409);
+		}
+
 		await userRepo.save(user);
 		response.status(201).end();
 	} catch (error) {
