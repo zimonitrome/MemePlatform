@@ -69,14 +69,14 @@ router.put("/:memeId", async (request, response) => {
 router.get("/:memeId", async (request, response) => {
 	try {
 		Vote.validateMemeId(request.params.memeId);
-		Vote.validateUsername(request.body.username);
+		Vote.validateUsername(request.query.username);
 
 		const voteRepo = getRepository(Vote);
 
 		const vote = await voteRepo
 			.findOneOrFail({
 				memeId: request.params.memeId,
-				username: request.body.username
+				username: request.query.username
 			})
 			.catch(dbErrorToCustomError);
 		response.status(200).json(vote);
