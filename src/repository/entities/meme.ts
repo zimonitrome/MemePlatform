@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { MemeTemplate, User } from ".";
 import { CustomError } from "../../helpers/CustomError";
+import getHotness from "./../../helpers/hotness";
 
 @Entity()
 export class Meme {
@@ -21,6 +22,7 @@ export class Meme {
 		this.imageSource = imageSource;
 		this.name = name;
 		this.votes = 0;
+		this.hotness = getHotness(this.votes, new Date());
 	}
 
 	async validate() {
@@ -87,6 +89,9 @@ export class Meme {
 
 	@Column()
 	votes!: number;
+
+	@Column({ type: "float" })
+	hotness!: number;
 
 	@CreateDateColumn()
 	postDate!: Date;

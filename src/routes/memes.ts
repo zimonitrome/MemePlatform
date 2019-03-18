@@ -1,5 +1,5 @@
 import express from "express";
-import { getRepository, Repository, Like } from "typeorm";
+import { getRepository } from "typeorm";
 import { Meme, Vote, Comment } from "../repository/entities";
 import whereQueryBuilder from "../helpers/whereQueryBuilder";
 import {
@@ -32,9 +32,11 @@ router.post("/", async (request, response) => {
 		await meme.validate();
 
 		const memeRepo = getRepository(Meme);
+
 		const savedMeme = await memeRepo.save(meme);
 		response.status(200).json(savedMeme);
 	} catch (error) {
+		console.log(error);
 		customErrorResponse(response, error);
 	}
 });
@@ -49,21 +51,13 @@ router.get("/", async (request, response) => {
 		const memes = await memeRepo.find({
 			where: whereQueries,
 			take: pageSize,
-			skip: request.query.page * pageSize || 0
+			skip: request.query.page * pageSize || 0,
+			order: {
+				hotness: "DESC"
+			}
 		});
-		response.status(200).json(memes);
-	} catch (error) {
-		customErrorResponse(response, error);
-	}
-});
 
-router.get("/:memeId", async (request, response) => {
-	try {
-		const memeRepo = getRepository(Meme);
-		const meme = await memeRepo.findOneOrFail({
-			where: { id: request.params.memeId }
-		});
-		response.status(200).json(meme);
+		response.status(200).json(memes);
 	} catch (error) {
 		customErrorResponse(response, error);
 	}

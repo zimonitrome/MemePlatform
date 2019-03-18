@@ -9,6 +9,7 @@ import {
 } from "../helpers/CustomError";
 import { authorize } from "../helpers/authorizationHelpers";
 import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from "constants";
+import getHotness from "./../helpers/hotness";
 
 const router = express.Router();
 
@@ -29,6 +30,8 @@ router.put("/:memeId", async (request, response) => {
 		});
 
 		const memeRepo = getRepository(Meme);
+		const meme = await memeRepo.findOneOrFail({ id: vote.memeId });
+		let memeVoteUpdateValue: number;
 
 		// Forced to split vote save due to typeorm/PostgreSQL bug
 		if (existingVote) {
@@ -42,10 +45,10 @@ router.put("/:memeId", async (request, response) => {
 			// Also updates votecount on meme
 			switch (vote.vote) {
 				case 1:
-					await memeRepo.increment({ id: vote.memeId }, "votes", 2);
+					memeVoteUpdateValue = 2;
 					break;
 				case -1:
-					await memeRepo.decrement({ id: vote.memeId }, "votes", 2);
+					memeVoteUpdateValue = -2;
 					break;
 			}
 		} else {
@@ -53,13 +56,23 @@ router.put("/:memeId", async (request, response) => {
 			// Also updates votecount on meme
 			switch (vote.vote) {
 				case 1:
-					await memeRepo.increment({ id: vote.memeId }, "votes", 1);
+					memeVoteUpdateValue = 1;
 					break;
 				case -1:
-					await memeRepo.decrement({ id: vote.memeId }, "votes", 1);
+					memeVoteUpdateValue = -1;
 					break;
 			}
 		}
+
+		// Also updates votecount and hotness on meme
+		await memeRepo.update(
+			{ id: vote.memeId },
+			{
+				hotness: getHotness(meme.votes, meme.postDate),
+				votes: meme.votes + memeVoteUpdateValue!
+			}
+		);
+
 		response.status(200).json(vote);
 	} catch (error) {
 		customErrorResponse(response, error);
