@@ -53,8 +53,6 @@ router.post("/", multerObj, async (request, response) => {
 		const memeTemplateRepo = getRepository(MemeTemplate);
 		const savedTemplate = await memeTemplateRepo.save(memeTemplate);
 
-		console.log(savedTemplate);
-
 		response.status(200).json(savedTemplate);
 	} catch (error) {
 		customErrorResponse(response, error);

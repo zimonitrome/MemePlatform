@@ -36,7 +36,6 @@ router.post("/", async (request, response) => {
 		const savedMeme = await memeRepo.save(meme);
 		response.status(200).json(savedMeme);
 	} catch (error) {
-		console.log(error);
 		customErrorResponse(response, error);
 	}
 });
